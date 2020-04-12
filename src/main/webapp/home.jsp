@@ -16,9 +16,7 @@
 </head>
 <body>
   <form action="rmp">
-  	<label>Department: </label>
-  	<input type="text" name="dept">
-  	<label>Course Number: </label>
+  	<label>Course Search: </label>
   	<input type="text" name="course">
   	<input type="submit">
   </form>

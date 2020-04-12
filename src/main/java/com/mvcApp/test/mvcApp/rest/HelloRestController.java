@@ -26,7 +26,7 @@ public class HelloRestController {
 	
 	
 	@RequestMapping("rmp")
-	public ModelAndView rmp(@RequestParam String dept, @RequestParam String course) {
+	public ModelAndView rmp(@RequestParam String course) {
 		String output = "<table style=\"width: 100%;\" id=\"professors\"><thead><tr data-sort-method=\"none\"><th>Open Status</th>"
 				+ "<th>Name</th>"
 				+ "<th>Professor</th>"
@@ -35,7 +35,7 @@ public class HelloRestController {
 
 		String term = "term_20f?";
 
-		String searchQuery = dept + "/" + course + "/" + term;
+		String searchQuery = course.trim().replace(" ", "/") + "/" + term;
 
 		WebClient client = new WebClient();
 		client.getOptions().setCssEnabled(false);

@@ -21,6 +21,7 @@
   	<input type="submit">
   </form>
   
-  <p>${output}</p>
+  <h2>Search Result for: ${course}</h2>
+  ${output}
 </body>
 </html>

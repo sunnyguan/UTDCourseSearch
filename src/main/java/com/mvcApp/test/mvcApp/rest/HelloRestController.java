@@ -27,7 +27,15 @@ public class HelloRestController {
 	
 	@RequestMapping("rmp")
 	public ModelAndView rmp(@RequestParam String course) {
-		String output = "<table style=\"width: 100%;\" id=\"professors\"><thead><tr data-sort-method=\"none\"><th>Open Status</th>"
+		String output = "<table style=\"width: 100%;\" id=\"professors\">"
+				+ "<colgroup>\r\n" + 
+				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 20%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 20%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 30%;\">\r\n" + 
+				"  </colgroup>"
+				+ "<thead><tr data-sort-method=\"none\"><th>Open Status</th>"
 				+ "<th>Name</th>"
 				+ "<th>Professor</th>"
 				+ "<th>Rating</th>"
@@ -42,6 +50,7 @@ public class HelloRestController {
 		client.getOptions().setJavaScriptEnabled(false);
 		
 		HashMap<String, String> ratings = new HashMap<String, String>();
+		ratings.put("-Staff-", "Not Found");
 		try {
 			String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;
 			HtmlPage page = client.getPage(searchUrl);
@@ -79,30 +88,43 @@ public class HelloRestController {
 								}
 							}
 
-							HtmlAnchor a = (HtmlAnchor) rmp
-									.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
-							rmp = a.click();
-							rating = ((HtmlDivision) rmp
-									.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
-											.asText();
-							rating += " based on " + ((HtmlAnchor) rmp
-									.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
-											.asText();
-							ratings.put(prof.asText(), rating);
+							try {
+								HtmlAnchor a = (HtmlAnchor) rmp
+										.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
+								
+								rmp = a.click();
+								rating = ((HtmlDivision) rmp
+										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
+												.asText();
+								rating += " based on " + ((HtmlAnchor) rmp
+										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
+												.asText();
+								ratings.put(prof.asText(), rating);
+							} catch (Exception e) {}
+							
+							
 						}
 					}
 				} else {
 					rating = ratings.get(prof.asText());
 				}
 				
+				String formatName = name.asText().replaceAll("\\(.*\\)", "");
+				
 				output += "<tr>";
 				output += "<td>" + open.asText() + "</td>";
 				if (name.asText().contains("CV Honors"))
-					output += "<td>" + name.asText() + "</td>";
+					output += "<td><b>" + formatName + "</b></td>";
 				else
-					output += "<td>" + name.asText() + "</td>";
+					output += "<td>" + formatName + "</td>";
 				output += "<td>" + prof.asText() + "</td>";
-				output += "<td>" + rating + "</td>";
+				
+				if(rating.equals("Not Found")) {
+					output += "<td data-sort-method='none'>" + rating + "</td>";
+				} else {
+					output += "<td>" + rating + "</td>";
+				}
+				
 				output += "<td>" + time.asText() + "</td>";
 				output += "</tr>";
 			}
@@ -115,6 +137,7 @@ public class HelloRestController {
 		
 		ModelAndView model = new ModelAndView("/");
 		model.addObject("output", output);
+		model.addObject("course", course);
 		return model;
 	}
 	

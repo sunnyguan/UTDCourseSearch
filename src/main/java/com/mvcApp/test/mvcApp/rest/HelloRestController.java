@@ -22,11 +22,21 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 public class HelloRestController {
 
 	@RequestMapping("/")
+	public String index() {
+		return "index.html";
+	}
+	
+	@RequestMapping("/home")
 	public String home() {
 		return "home.jsp";
 	}
 	
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+	
+	@RequestMapping("/cc")
+	public String cc() {
+		return "test.html";
+	}
 	
 	@RequestMapping("rmp")
 	public ModelAndView rmp(@RequestParam String course, @RequestParam String term) {
@@ -171,12 +181,14 @@ public class HelloRestController {
 		double time = (System.currentTimeMillis() - t) / 1000.0;
 		System.out.println("Completed Request in " + (System.currentTimeMillis() - t) / 1000 + " seconds.");
 		
-		ModelAndView model = new ModelAndView("/");
+		ModelAndView model = new ModelAndView("/home");
 		model.addObject("output", output);
 		model.addObject("course", course);
 		model.addObject("time", time);
 		return model;
 	}
+	
+	
 	
 	/*
 	 <%

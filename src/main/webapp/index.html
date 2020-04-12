@@ -1,0 +1,93 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="author" content="colorlib.com">
+<link href="https://fonts.googleapis.com/css?family=Poppins"
+	rel="stylesheet" />
+<link href="css/main.css" rel="stylesheet" />
+</head>
+<body style="background-image: url('images/utd.jpg');">
+	<div class="s003">
+		<form action="/rmp">
+			<div class="inner-form">
+				<div class="input-field first-wrap">
+					<div class="input-select">
+						<select data-trigger="" class="choices-single-defaul term-popup" id="srch_term" name="term">
+							<option value="term_all">Search All Terms</option>
+							<option value="_2020">---------------</option>
+							<option value="term_20f" selected="">2020 Fall (20f)</option>
+							<option value="term_20u">2020 Summer (20u)</option>
+							<option value="term_20s">2020 Spring (20s)</option>
+							<option value="_2019">---------------</option>
+							<option value="term_19f">2019 Fall (19f)</option>
+							<option value="term_19u">2019 Summer (19u)</option>
+							<option value="term_19s">2019 Spring (19s)</option>
+							<option value="_2018">---------------</option>
+							<option value="term_18f">2018 Fall (18f)</option>
+							<option value="term_18u">2018 Summer (18u)</option>
+							<option value="term_18s">2018 Spring (18s)</option>
+							<option value="_2017">---------------</option>
+							<option value="term_17f">2017 Fall (17f)</option>
+							<option value="term_17u">2017 Summer (17u)</option>
+							<option value="term_17s">2017 Spring (17s)</option>
+							<option value="_2016">---------------</option>
+							<option value="term_16f">2016 Fall (16f)</option>
+							<option value="term_16u">2016 Summer (16u)</option>
+							<option value="term_16s">2016 Spring (16s)</option>
+							<option value="_2015">---------------</option>
+							<option value="term_15f">2015 Fall (15f)</option>
+							<option value="term_15u">2015 Summer (15u)</option>
+							<option value="term_15s">2015 Spring (15s)</option>
+							<option value="_2014">---------------</option>
+							<option value="term_14f">2014 Fall (14f)</option>
+							<option value="term_14u">2014 Summer (14u)</option>
+							<option value="term_14s">2014 Spring (14s)</option>
+							<option value="_2013">---------------</option>
+							<option value="term_13f">2013 Fall (13f)</option>
+							<option value="term_13u">2013 Summer (13u)</option>
+							<option value="term_13s">2013 Spring (13s)</option>
+							<option value="_2012">---------------</option>
+							<option value="term_12f">2012 Fall (12f)</option>
+							<option value="term_12u">2012 Summer (12u)</option>
+							<option value="term_12s">2012 Spring (12s)</option>
+							<option value="_2011">---------------</option>
+							<option value="term_11f">2011 Fall (11f)</option>
+							<option value="term_11u">2011 Summer (11u)</option>
+							<option value="term_11s">2011 Spring (11s)</option>
+							<option value="_2010">---------------</option>
+							<option value="term_10f">2010 Fall (10f)</option>
+							<option value="term_10u">2010 Summer (10u)</option>
+							<option value="term_10s">2010 Spring (10s)</option>
+						</select>
+
+					</div>
+				</div>
+				<div class="input-field second-wrap">
+					<input name="course" id="search" type="text" placeholder="Enter Keywords (Course Name, Instructor, Etc)" />
+				</div>
+				<div class="input-field third-wrap">
+					<button class="btn-search" type="button">
+						<svg class="svg-inline--fa fa-search fa-w-16" aria-hidden="true"
+							data-prefix="fas" data-icon="search" role="img"
+							xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor"
+								d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
+              </svg>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script src="js/extention/choices.js"></script>
+	<script>
+		const choices = new Choices('[data-trigger]', {
+			searchEnabled : false,
+			shouldSort : false,
+			itemSelectText : '',
+		});
+	</script>
+</body>
+<!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>

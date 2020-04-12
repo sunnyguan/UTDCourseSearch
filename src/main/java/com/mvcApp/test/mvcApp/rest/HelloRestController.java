@@ -1,5 +1,7 @@
 package com.mvcApp.test.mvcApp.rest;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,9 +26,13 @@ public class HelloRestController {
 		return "home.jsp";
 	}
 	
+	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 	
 	@RequestMapping("rmp")
-	public ModelAndView rmp(@RequestParam String course) {
+	public ModelAndView rmp(@RequestParam String course, @RequestParam String term) {
+		long t = System.currentTimeMillis();
+		System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
+		
 		String output = "<table style=\"width: 100%;\" id=\"professors\">"
 				+ "<colgroup>\r\n" + 
 				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
@@ -41,9 +47,9 @@ public class HelloRestController {
 				+ "<th>Rating</th>"
 				+ "<th>Schedule</th></tr></thead>";
 
-		String term = "term_20f?";
+		// String term = "term_20f?";
 
-		String searchQuery = course.trim().replace(" ", "/") + "/" + term;
+		String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
 
 		WebClient client = new WebClient();
 		client.getOptions().setCssEnabled(false);
@@ -96,10 +102,16 @@ public class HelloRestController {
 								rating = ((HtmlDivision) rmp
 										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
 												.asText();
-								rating += " based on " + ((HtmlAnchor) rmp
-										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
-												.asText();
-								ratings.put(prof.asText(), rating);
+								
+								if(!rating.contains("N/A")) {
+									rating += " based on " + ((HtmlAnchor) rmp
+											.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
+													.asText();
+									ratings.put(prof.asText(), rating);
+								} else {
+									rating = "No Ratings";
+								}
+								
 							} catch (Exception e) {}
 							
 							
@@ -109,20 +121,41 @@ public class HelloRestController {
 					rating = ratings.get(prof.asText());
 				}
 				
-				String formatName = name.asText().replaceAll("\\(.*\\)", "");
+				String formatName = name.asText().replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
+				
+				HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
+				String url = a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
+				
+				/*if(rating.contains("No")) {
+					output += "<tr data-sort-method='none'>";
+				}*/
 				
 				output += "<tr>";
 				output += "<td>" + open.asText() + "</td>";
+				
+				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
 				if (name.asText().contains("CV Honors"))
-					output += "<td><b>" + formatName + "</b></td>";
+					output += "<b>" + formatName + "</b></a></td>";
 				else
-					output += "<td>" + formatName + "</td>";
+					output += formatName + "</a></td>";
 				output += "<td>" + prof.asText() + "</td>";
 				
-				if(rating.equals("Not Found")) {
-					output += "<td data-sort-method='none'>" + rating + "</td>";
-				} else {
-					output += "<td>" + rating + "</td>";
+				if(rating.contains("No")) 
+					output += "<td data-sort='0'>" + rating + "</td>";
+				else {
+					String add = "";
+					try {
+						double r = Double.parseDouble(rating.split(" ")[0]);
+						add = " class='";
+						if(r <= 2.5) {
+							add += "uhoh'";
+						} else if(r >= 4.5) {
+							add += "ahhh'";
+						} else {
+							add += "normal'";
+						}
+					}catch(Exception e) {}
+					output += "<td" + add + ">" + rating + "</td>";
 				}
 				
 				output += "<td>" + time.asText() + "</td>";
@@ -135,9 +168,13 @@ public class HelloRestController {
 			e.printStackTrace();
 		}
 		
+		double time = (System.currentTimeMillis() - t) / 1000.0;
+		System.out.println("Completed Request in " + (System.currentTimeMillis() - t) / 1000 + " seconds.");
+		
 		ModelAndView model = new ModelAndView("/");
 		model.addObject("output", output);
 		model.addObject("course", course);
+		model.addObject("time", time);
 		return model;
 	}
 	

@@ -4,6 +4,7 @@
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
 <link href="main.css" rel="stylesheet" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/tablesort.min.js"></script>
 <script>
 	function onPageReady() {
 		// Documentation: http://tristen.ca/tablesort/demo/
@@ -22,7 +23,7 @@
 	</form>
 
 	<h2>Search Result for: ${course}</h2>
-	<p>Time taken: ${time} seconds</p>
+	<p>Time taken: ${time} seconds, Number of Professors: ${numProfs}</p>
 	${output}
 	
 </body>

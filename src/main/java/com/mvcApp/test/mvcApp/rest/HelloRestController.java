@@ -83,7 +83,7 @@ public class HelloRestController {
 						.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[5]");
 
 				String rating = "Not Found";
-				if(!ratings.containsKey(prof.asText())) {
+				if(!ratings.containsKey(prof.asText().trim())) {
 					if (!prof.asText().toLowerCase().contains("staff")) {
 						// Rate My Professor Scan
 						String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof.asText().trim();
@@ -117,7 +117,7 @@ public class HelloRestController {
 									rating += " based on " + ((HtmlAnchor) rmp
 											.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
 													.asText();
-									ratings.put(prof.asText(), rating);
+									ratings.put(prof.asText().trim(), rating);
 								} else {
 									rating = "No Ratings";
 								}
@@ -128,7 +128,7 @@ public class HelloRestController {
 						}
 					}
 				} else {
-					rating = ratings.get(prof.asText());
+					rating = ratings.get(prof.asText().trim());
 				}
 				
 				String formatName = name.asText().replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
@@ -185,6 +185,7 @@ public class HelloRestController {
 		model.addObject("output", output);
 		model.addObject("course", course);
 		model.addObject("time", time);
+		model.addObject("numProfs", ratings.size());
 		return model;
 	}
 	

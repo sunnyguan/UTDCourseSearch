@@ -23,7 +23,7 @@
 	</form>
 
 	<h2>Search Result for: ${course}</h2>
-	<p>Time taken: ${time} seconds, Number of Professors: ${numProfs}</p>
+	<p>Time taken: ${time} seconds, Number of Professors in Database: ${numProfs}</p>
 	${output}
 	
 </body>

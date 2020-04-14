@@ -7,8 +7,18 @@
 <link href="https://fonts.googleapis.com/css?family=Poppins"
 	rel="stylesheet" />
 <link href="css/main.css" rel="stylesheet" />
+
+<script>
+function onPageReady() {
+	var val = Math.floor(Math.random() * (4 - 1 + 1) + 1);
+	document.getElementById("bod").style.backgroundImage="url(images/" + val + ".jpg)";
+}
+
+// Run the above function when the page is loaded & ready
+document.addEventListener('DOMContentLoaded', onPageReady, false);
+</script>
 </head>
-<body style="background-image: url('images/utd.jpg');">
+<body id="bod">
 	<div class="s003">
 		<form action="/rmp">
 			<div class="inner-form">
@@ -88,6 +98,8 @@
 			itemSelectText : '',
 		});
 	</script>
+
+
 </body>
 <!-- This templates was made by Colorlib (https://colorlib.com) -->
 </html>

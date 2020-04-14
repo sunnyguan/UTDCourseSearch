@@ -2,28 +2,17 @@ package com.mvcApp.test.mvcApp.rest;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
@@ -31,81 +20,78 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
+import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
+import com.gargoylesoftware.htmlunit.javascript.host.URL;
 
 public class UTDDBUpgrader {
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-	HashMap<String, String> searches = new HashMap<String, String>();
-	HashMap<String, String> recordRatings = new HashMap<String, String>();
-	void saveSearch() {
-		FileOutputStream fileOut;
+
+	static HashMap<String, String> searches = new HashMap<String, String>();
+	static HashMap<String, String> profToRating = new HashMap<String, String>();
+	static HashMap<String, String> profToGPA = new HashMap<String, String>();
+	
+	static Object readFile(String name) {
 		try {
-			fileOut = new FileOutputStream("searches.ser");
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(searches);
-			out.close();
-			fileOut.close();
-			
-			System.out.println("Wrote a new search, new size = " + searches.size());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	void readHashMaps() {
-		try {
-			FileInputStream fileIn = new FileInputStream("recordedRatings.ser");
+			FileInputStream fileIn = new FileInputStream(name);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			
-			recordRatings = (HashMap<String, String>) in.readObject();
+			Object obj = in.readObject();
 			in.close();
 			fileIn.close();
-			System.err.println("Read complete! Size = " + recordRatings.size());
+			return obj;
 		} catch (IOException i) {
-			return;
+			return null;
 		} catch (ClassNotFoundException c) {
-			System.out.println("Classes not found");
-			return;
+			return null;
 	    }
 	}
-	void saveRecordRatings() {
+	
+	static boolean saveFile(String name, Object obj) {
 		FileOutputStream fileOut;
 		try {
-			fileOut = new FileOutputStream("recordedRatings.ser");
+			fileOut = new FileOutputStream(name);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(recordRatings);
+			out.writeObject(obj);
 			out.close();
 			fileOut.close();
-			
-			System.out.println("Wrote a new professor, new size = " + recordRatings.size());
+			return true;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			return false;
 		}
 	}
-	void readSearches() {
-		try {
-			FileInputStream fileIn = new FileInputStream("searches.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			
-			searches = (HashMap<String, String>) in.readObject();
-			in.close();
-			fileIn.close();
-			System.err.println("Read complete! Searches size = " + searches.size());
-		} catch (IOException i) {
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Classes not found");
-			return;
-	    }
+	
+	static void readProfToGPA() {
+		profToGPA = (HashMap<String, String>) readFile("profToGPA.ser");
+		System.out.println("Read complete! GPA Size = " + profToGPA.size());
+	}
+	
+	static void readProfToRating() {
+		profToRating = (HashMap<String, String>) readFile("profToRating.ser");
+		System.out.println("Read complete! Rating size = " + profToRating.size());
+	}
+	
+	static void saveProfToRating() {
+		boolean status = saveFile("profToRating.ser", profToRating);
+		System.out.println("Writing profToRating success: " + status);
+	}
+	
+	static void readSearches() {
+		searches = (HashMap<String, String>) readFile("searches.ser");
+		System.out.println("Read complete! Search size = " + searches.size());
+	}
+	
+	static void saveSearch() {
+		boolean status = saveFile("searches.ser", searches);
+		System.out.println("Writing searches success: " + status);
 	}
 	
 	public String padRight(String s, int n) {
 		return String.format("%-" + n + "s", s);
 	}
 	
-	public static void main(String[] args) { new UTDDBUpgrader().run(); }
+	public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException { new UTDDBUpgrader().run(); }
 	
 	// flowchart:
 	// 1. Need to update searches and RMP ratings
@@ -113,23 +99,23 @@ public class UTDDBUpgrader {
 	// 3. Update recordRatings.ser by going through each professor and checking again
 	// 4. Update searches
 	
-	public void run() {
+	public void run() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		setup();
-		readHashMaps(); // load in hash maps
+		readProfToRating(); // load in hash maps
 		readSearches(); // load in searches
 		System.out.println("INFO: Old ratings and searches loaded.");
 		
 		// update hashmaps
-		HashMap<String, String> newRecordRatings = new HashMap<String, String>();
+		HashMap<String, String> newProfToRating = new HashMap<String, String>();
 		int i = 0;
-		for (Map.Entry<String, String> s : recordRatings.entrySet()) {
+		for (Map.Entry<String, String> s : profToRating.entrySet()) {
 			String name = s.getKey();
-			System.out.println("Updating professor " + padRight(i++ + "", 5) + "/" + recordRatings.size() + ": " + name);
+			System.out.println("Updating professor " + padRight(i++ + "", 5) + "/" + profToRating.size() + ": " + name);
 			String newOutput = rating(name);
-			newRecordRatings.put(name, newOutput);
+			newProfToRating.put(name, newOutput);
 		}
-		recordRatings = newRecordRatings;
-		saveRecordRatings(); // saves searches
+		profToRating = newProfToRating;
+		saveProfToRating(); // saves searches
 		System.out.println("INFO: Ratings updated.");
 		
 		// update searches
@@ -151,72 +137,87 @@ public class UTDDBUpgrader {
 		client = new WebClient();
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
+		client.getOptions().setThrowExceptionOnFailingStatusCode(false);
+		client.getOptions().setPrintContentOnFailingStatusCode(false);
+		client.getOptions().setThrowExceptionOnScriptError(false);
+		client.getOptions().setJavaScriptEnabled(false);
+		client.setCssErrorHandler(new SilentCssErrorHandler());
+		client.setHTMLParserListener(new HTMLParserListener() {
+			@Override
+			public void error(String message, java.net.URL url, String html, int line, int column, String key) {
+				
+			}
+
+			@Override
+			public void warning(String message, java.net.URL url, String html, int line, int column, String key) {
+				
+			}
+		});
 	}
 	
-	public String rating(String prof) {
-		String rating = "Not Found";
+	public String rating(String prof) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+		String rating = "0 Ratings Found";
 		if (!prof.toLowerCase().contains("staff")) {
-			String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof.trim();
-			try {
-				HtmlPage rmp = client.getPage(url);
-				HtmlUnorderedList allProfs = (HtmlUnorderedList) rmp
-						.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
-				int index = -1;
-
-				if(allProfs != null) {
-					for (int i = 1; i <= allProfs.getChildElementCount(); i++) {
-						HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
-								"//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
-						if (school != null && school.asText().contains("The University of Texas at Dallas")) {
-							index = i;
-							break;
-						}
+			// Rate My Professor Scan
+			String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof;
+			HtmlPage rmp = client.getPage(url);
+			HtmlUnorderedList allProfs = (HtmlUnorderedList) rmp
+					.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
+			int index = -1;
+			
+			if(allProfs != null) {
+				for (int i = 1; i <= allProfs.getChildElementCount(); i++) {
+					HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
+							"//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
+					if (school != null && school.asText().contains("The University of Texas at Dallas")) {
+						index = i;
+						break;
 					}
-
-					try {
-						HtmlAnchor a = (HtmlAnchor) rmp
-								.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
-						
-						rmp = a.click();
-						rating = ((HtmlDivision) rmp
-								.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
-										.asText();
-						
-						if(!rating.contains("N/A")) {
-							rating += " based on " + ((HtmlAnchor) rmp
-									.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
-											.asText();
-						} else {
-							rating = "No Ratings";
-						}
-						
-					} catch (Exception e) {}
-					
-					
 				}
-			} catch (Exception e) {
+
+				try {
+					HtmlAnchor a = (HtmlAnchor) rmp
+							.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
+					
+					rmp = a.click();
+					rating = ((HtmlDivision) rmp
+							.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
+									.asText();
+					
+					if(!rating.contains("N/A")) {
+						rating += " based on " + ((HtmlAnchor) rmp
+								.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
+										.asText();
+					} else {
+						rating = "0 Ratings Found";
+					}
+				} catch (Exception e) {}
 			}
 		}
+		profToRating.put(prof, rating);
+		saveProfToRating();
 		return rating;
 	}
 	
 	public String newSearch(String course, String term) {
-		
-		
-		System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
+		// System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
 		
 		String output = "<table style=\"width: 100%;\" id=\"professors\">"
 				+ "<colgroup>\r\n" + 
-				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 5%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 20%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 20%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 30%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
 				"  </colgroup>"
-				+ "<thead><tr data-sort-method=\"none\"><th>Open Status</th>"
+				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th>Name</th>"
 				+ "<th>Professor</th>"
 				+ "<th>Rating</th>"
+				+ "<th>Avg. GPA</th>"
+				+ "<th>SG Rank</th>"
 				+ "<th>Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
@@ -227,7 +228,7 @@ public class UTDDBUpgrader {
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
 		
-		recordRatings.put("-Staff-", "Not Found");
+		profToRating.put("-Staff-", "0 Ratings Found");
 		try {
 			String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;
 			HtmlPage page = client.getPage(searchUrl);
@@ -239,99 +240,52 @@ public class UTDDBUpgrader {
 				
 				HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
 				
-				HtmlSpan open = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+				HtmlSpan openSpan = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+				String open = "Unknown";
+				if(openSpan != null) open = openSpan.asText();
+				
 				String name = tr.getCell(2).asText();
 				String prof = tr.getCell(3).asText();
 				String time = tr.getCell(4).asText();
 
-				String rating = "Not Found";
-				String profLastFirst = "-Staff-";
+				String currentRating = rating(prof); // always check web since we're updating DB
 				
-				if(!prof.trim().toLowerCase().contains("staff")) {
-					profLastFirst = prof.split(" ")[1] + ", " + prof.split(" ")[0];
+				String avgGPA = "N/A";
+				if(profToGPA.containsKey(prof)) 
+					avgGPA = profToGPA.get(prof);
+				
+				String overallRating = "N/A";
+				double gpaWeight = 70;
+				if(currentRating.contains("based on") && !avgGPA.contentEquals("N/A")) {
+					double info0 = 2;
+					try {
+						info0 = Double.parseDouble(avgGPA.split(" ")[0]);
+					} catch (Exception e) {}
+					double scores = Double.parseDouble(currentRating.split(" ")[0]) / 5 * (100 - gpaWeight) + info0 / 4 * gpaWeight;
+					scores = (double) Math.round(scores * 100d) / 100d; // adjust scaling !
+					overallRating = scores + "";
 				}
 				
-				if(!recordRatings.containsKey(profLastFirst)) {
-					System.out.println("Uh oh, checking web...:" + profLastFirst);
-					if (!prof.toLowerCase().contains("staff")) {
-						// Rate My Professor Scan
-						String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof;
-						HtmlPage rmp = client.getPage(url);
-						// *[@id="searchResultsBox"]/div[2]/ul/li[1]/a/span[2]/span[2]
-						// *[@id="searchResultsBox"]/div[2]/ul/li[2]/a/span[2]/span[2]
-						HtmlUnorderedList allProfs = (HtmlUnorderedList) rmp
-								.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
-						int index = -1;
-						
-						if(allProfs != null) {
-							for (int i = 1; i <= allProfs.getChildElementCount(); i++) {
-								HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
-										"//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
-								if (school != null && school.asText().contains("The University of Texas at Dallas")) {
-									index = i;
-									break;
-								}
-							}
-
-							try {
-								HtmlAnchor a = (HtmlAnchor) rmp
-										.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
-								
-								rmp = a.click();
-								rating = ((HtmlDivision) rmp
-										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
-												.asText();
-								
-								if(!rating.contains("N/A")) {
-									rating += " based on " + ((HtmlAnchor) rmp
-											.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
-													.asText();
-								} else {
-									rating = "No Ratings";
-								}
-								
-								recordRatings.put(profLastFirst, rating);
-								saveRecordRatings();
-							} catch (Exception e) {
-								recordRatings.put(profLastFirst, rating);
-								saveRecordRatings();
-							}
-						} else {
-							recordRatings.put(profLastFirst, rating);
-							saveRecordRatings();
-						}
-					}
-				} else {
-					rating = recordRatings.get(profLastFirst);
-				}
+				String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 				
-				
-				
-				String formatName = name;//.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
-				
-				// HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
-				String url = "";//a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
-				
-				/*if(rating.contains("No")) {
-					output += "<tr data-sort-method='none'>";
-				}*/
+				HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
+				String url = a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
 				
 				output += "<tr>";
-				output += "<td>" + open.asText() + "</td>";
-				
+				output += "<td>" + open + "</td>";
 				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
 				if (name.contains("CV Honors"))
 					output += "<b>" + formatName + "</b></a></td>";
 				else
 					output += formatName + "</a></td>";
-				output += "<td>" + prof + "</td>";
 				
-				if(rating.contains("No")) 
-					output += "<td data-sort='0'>" + rating + "</td>";
-				else {
+				output += "<td>" + prof + "</td>";
+				if(currentRating.contains("0 Ratings")) {
+					output += "<td>" + currentRating + "</td>";
+				} else {
 					String add = "";
 					try {
-						double r = Double.parseDouble(rating.split(" ")[0]);
+						double r = Double.parseDouble(currentRating.split(" ")[0]);
 						add = " class='";
 						if(r <= 2.5) {
 							add += "uhoh'";
@@ -341,23 +295,19 @@ public class UTDDBUpgrader {
 							add += "normal'";
 						}
 					}catch(Exception e) {}
-					output += "<td" + add + ">" + rating + "</td>";
+					output += "<td" + add + ">" + currentRating + "</td>";
 				}
 				
+				output += "<td>" + avgGPA + "</td>";
+				output += "<td data-sort-method='number'>" + overallRating + "</td>";
 				output += "<td>" + time + "</td>";
 				output += "</tr>";
-				
-				System.out.println("Processing " + padRight(profLastFirst, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
+				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
 			}
-			
 			output += "</table>";
-			
-			
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return output;
 	}
 }

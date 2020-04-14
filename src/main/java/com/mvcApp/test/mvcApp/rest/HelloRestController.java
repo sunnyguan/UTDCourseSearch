@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
@@ -31,12 +33,17 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 public class HelloRestController {
 
 	final boolean FORCENEW = false;
+	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+	
+	static HashMap<String, String> searches = new HashMap<String, String>();
+	static HashMap<String, String> profToRating = new HashMap<String, String>();
+	static HashMap<String, String> profToGPA = new HashMap<String, String>();
 	
 	@Scheduled(cron = "0 1 1 * * ?")
-	public void scheduleTaskWithFixedRate() {
-	    UTDDBUpgrader.main(null);
+	public void scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+	    new UTDDBUpgrader().run();
 	    readSearches();
-		readHashMaps();
+		readProfToRating();
 	}
 	
 	@RequestMapping("/")
@@ -49,107 +56,72 @@ public class HelloRestController {
 		return "home.jsp";
 	}
 	
-	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-	
 	@RequestMapping("/cc")
 	public String cc() {
 		return "test.html";
 	}
 	
-	static HashMap<String, String> ratings = new HashMap<String, String>();
-	
-	static HashMap<String, double[]> recordedGrades = new HashMap<String, double[]>();
-	
-	static void readRecordedGrades() {
-		try {
-			FileInputStream fileIn = new FileInputStream("recordedGrades.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			
-			recordedGrades = (HashMap<String, double[]>) in.readObject();
-			in.close();
-			fileIn.close();
-			System.err.println("Read complete! Size = " + ratings.size());
-		} catch (IOException i) {
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Classes not found");
-			return;
-	    }
-	}
-	
-	public static void readHashMaps() {
-		try {
-			FileInputStream fileIn = new FileInputStream("recordedRatings.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			
-			ratings = (HashMap<String, String>) in.readObject();
-			in.close();
-			fileIn.close();
-			System.err.println("Read complete! Size = " + ratings.size());
-		} catch (IOException i) {
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Classes not found");
-			return;
-	    }
-	}
-	
-	static void saveHashMaps() {
+	static boolean saveFile(String name, Object obj) {
 		FileOutputStream fileOut;
 		try {
-			fileOut = new FileOutputStream("recordedRatings.ser");
+			fileOut = new FileOutputStream(name);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(ratings);
+			out.writeObject(obj);
 			out.close();
 			fileOut.close();
-			
-			System.out.println("Wrote a new professor, new size = " + ratings.size());
+			return true;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			return false;
 		}
 	}
 	
-	static HashMap<String, String> searches = new HashMap<String, String>();
+	static Object readFile(String name) {
+		try {
+			FileInputStream fileIn = new FileInputStream(name);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			
+			Object obj = in.readObject();
+			in.close();
+			fileIn.close();
+			return obj;
+		} catch (IOException i) {
+			return null;
+		} catch (ClassNotFoundException c) {
+			return null;
+	    }
+	}
+	
+	static void readProfToGPA() {
+		profToGPA = (HashMap<String, String>) readFile("profToGPA.ser");
+		System.out.println("Read complete! GPA Size = " + profToGPA.size());
+	}
+	
+	static void readProfToRating() {
+		profToRating = (HashMap<String, String>) readFile("profToRating.ser");
+		System.out.println("Read complete! Rating size = " + profToRating.size());
+	}
+	
+	static void saveProfToRating() {
+		boolean status = saveFile("profToRating.ser", profToRating);
+		System.out.println("Writing profToRating success: " + status);
+	}
+	
+	static void readSearches() {
+		searches = (HashMap<String, String>) readFile("searches.ser");
+		System.out.println("Read complete! Search size = " + searches.size());
+	}
+	
+	static void saveSearch() {
+		boolean status = saveFile("searches.ser", searches);
+		System.out.println("Writing searches success: " + status);
+	}
 	
 	public static void startup() {
 		readSearches();
-		readHashMaps();
-		readRecordedGrades();
-	}
-	
-	public static void readSearches() {
-		try {
-			FileInputStream fileIn = new FileInputStream("searches.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			
-			searches = (HashMap<String, String>) in.readObject();
-			in.close();
-			fileIn.close();
-			System.err.println("Read complete! Search size = " + ratings.size());
-		} catch (IOException i) {
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Classes not found");
-			return;
-	    }
-	}
-	static void saveSearch() {
-		FileOutputStream fileOut;
-		try {
-			fileOut = new FileOutputStream("searches.ser");
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(searches);
-			out.close();
-			fileOut.close();
-			
-			System.out.println("Wrote a new search, new size = " + searches.size());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		readProfToRating();
+		readProfToGPA();
 	}
 	
 	public String padRight(String s, int n) {
@@ -158,9 +130,7 @@ public class HelloRestController {
 	
 	@RequestMapping("rmp")
 	public ModelAndView rmp(@RequestParam String course, @RequestParam String term) {
-		
-		System.err.println(ratings.size());
-		
+		System.out.println(profToRating.size());
 		long t = System.currentTimeMillis();
 		
 		String output = "";
@@ -180,7 +150,7 @@ public class HelloRestController {
 		model.addObject("output", output);
 		model.addObject("course", course);
 		model.addObject("time", time / 1000.0);
-		model.addObject("numProfs", ratings.size());
+		model.addObject("numProfs", profToRating.size());
 		return model;
 	}
 	
@@ -197,12 +167,12 @@ public class HelloRestController {
 				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
 				"  </colgroup>"
-				+ "<thead><tr data-sort-method=\"none\"><th>Open Status</th>"
+				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th>Name</th>"
 				+ "<th>Professor</th>"
 				+ "<th>Rating</th>"
 				+ "<th>Avg. GPA</th>"
-				+ "<th>SG Rank /100</th>"
+				+ "<th>SG Rank</th>"
 				+ "<th>Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
@@ -213,7 +183,7 @@ public class HelloRestController {
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
 		
-		ratings.put("-Staff-", "Not Found");
+		profToRating.put("-Staff-", "0 Ratings Found");
 		try {
 			String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;
 			HtmlPage page = client.getPage(searchUrl);
@@ -225,20 +195,18 @@ public class HelloRestController {
 				
 				HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
 				
-				HtmlSpan open = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+				HtmlSpan openSpan = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+				String open = "Unknown";
+				if(openSpan != null) open = openSpan.asText();
+				
 				String name = tr.getCell(2).asText();
 				String prof = tr.getCell(3).asText();
 				String time = tr.getCell(4).asText();
 
-				String rating = "Not Found";
-				String profLastFirst = "-Staff-";
+				String rating = "0 Ratings Found";
 				
-				if(!prof.trim().toLowerCase().contains("staff")) {
-					profLastFirst = prof.split(" ")[1] + ", " + prof.split(" ")[0];
-				}
-				
-				if(!ratings.containsKey(profLastFirst)) {
-					System.out.println("Uh oh, checking web...:" + profLastFirst);
+				if(!profToRating.containsKey(prof)) {
+					System.out.println("Uh oh, checking web...:" + prof);
 					if (!prof.toLowerCase().contains("staff")) {
 						// Rate My Professor Scan
 						String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof;
@@ -273,40 +241,40 @@ public class HelloRestController {
 											.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
 													.asText();
 								} else {
-									rating = "No Ratings";
+									rating = "0 Ratings Found";
 								}
 								
-								ratings.put(profLastFirst, rating);
-								saveHashMaps();
+								profToRating.put(prof, rating);
+								saveProfToRating();
 							} catch (Exception e) {
-								ratings.put(profLastFirst, rating);
-								saveHashMaps();
+								profToRating.put(prof, rating);
+								saveProfToRating();
 							}
 						} else {
-							ratings.put(profLastFirst, rating);
-							saveHashMaps();
+							profToRating.put(prof, rating);
+							saveProfToRating();
 						}
 					}
 				} else {
-					rating = ratings.get(profLastFirst);
+					rating = profToRating.get(prof);
 				}
 				
 				String avgGPA = "N/A";
-				double[] info = null;
-				if(recordedGrades.containsKey(profLastFirst)) {
-					info = recordedGrades.get(profLastFirst);
-					double avg = (double) Math.round(info[0] * 100d) / 100d;
-					avgGPA = avg + " with " + (int) info[1] + " students";
+				if(profToGPA.containsKey(prof)) {
+					avgGPA = profToGPA.get(prof);
 				}
 				
 				String overallRating = "N/A";
 				double gpaWeight = 70;
 				if(rating.contains("based on") && !avgGPA.contentEquals("N/A")) {
-					double scores = Double.parseDouble(rating.split(" ")[0]) / 5 * (100 - gpaWeight) + info[0] / 4 * gpaWeight ;
-					scores = (double) Math.round(1.3 * scores * 100d) / 100d; // adjust scaling !
+					double info0 = 2;
+					try {
+						info0 = Double.parseDouble(avgGPA.split(" ")[0]);
+					} catch (Exception e) {}
+					double scores = Double.parseDouble(rating.split(" ")[0]) / 5 * (100 - gpaWeight) + info0 / 4 * gpaWeight;
+					scores = (double) Math.round(scores * 100d) / 100d; // adjust scaling !
 					overallRating = scores + "";
 				}
-				
 				
 				String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 				
@@ -318,7 +286,8 @@ public class HelloRestController {
 				}*/
 				
 				output += "<tr>";
-				output += "<td>" + open.asText() + "</td>";
+				
+				output += "<td>" + open + "</td>";
 				
 				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
 				if (name.contains("CV Honors"))
@@ -327,9 +296,10 @@ public class HelloRestController {
 					output += formatName + "</a></td>";
 				output += "<td>" + prof + "</td>";
 				
-				if(rating.contains("No")) 
-					output += "<td data-sort='0'>" + rating + "</td>";
-				else {
+				// System.out.println("Rating: " + rating);
+				if(rating.contains("0 Ratings")) {
+					output += "<td>" + rating + "</td>";
+				} else {
 					String add = "";
 					try {
 						double r = Double.parseDouble(rating.split(" ")[0]);
@@ -347,12 +317,12 @@ public class HelloRestController {
 				
 				output += "<td>" + avgGPA + "</td>";
 				
-				output += "<td>" + overallRating + "</td>";
+				output += "<td data-sort-method='number'>" + overallRating + "</td>";
 				
 				output += "<td>" + time + "</td>";
 				output += "</tr>";
 				
-				System.out.println("Processing " + padRight(profLastFirst, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
+				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
 			}
 			
 			output += "</table>";

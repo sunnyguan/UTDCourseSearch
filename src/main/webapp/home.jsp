@@ -4,7 +4,9 @@
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
 <link href="main.css" rel="stylesheet" type="text/css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.1.0/tablesort.min.js"></script>
+<script src="js/tablesort.js"></script>
+<script src="js/sorts/tablesort.number.js"></script>
+
 <script>
 	function onPageReady() {
 		// Documentation: http://tristen.ca/tablesort/demo/

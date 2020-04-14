@@ -165,14 +165,16 @@ public class HelloRestController {
 		String output = "<table style=\"width: 100%;\" id=\"professors\">"
 				+ "<colgroup>\r\n" + 
 				"       <col span=\"1\" style=\"width: 5%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 20%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 8%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 17%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 15%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
+				+ "<th>Course</th>"
 				+ "<th>Name</th>"
 				+ "<th>Professor</th>"
 				+ "<th>Rating</th>"
@@ -283,8 +285,15 @@ public class HelloRestController {
 				
 				String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 				
-				// HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
-				String url = "";//a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
+				HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
+				String url = a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
+				
+				String sect = "N/A";
+				try {
+					String[] cc = url.split("\\.")[0].split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+					sect = cc[0].toUpperCase() + " " + cc[1]; 
+				} catch (Exception e) {}
+
 				
 				/*if(rating.contains("No")) {
 					output += "<tr data-sort-method='none'>";
@@ -293,6 +302,8 @@ public class HelloRestController {
 				output += "<tr>";
 				
 				output += "<td>" + open + "</td>";
+				
+				output += "<td>" + sect + "</td>";
 				
 				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
 				if (name.contains("CV Honors"))

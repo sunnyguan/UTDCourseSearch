@@ -109,8 +109,13 @@ public class HelloRestController {
 	}
 	
 	static void readSearches() {
-		searches = (HashMap<String, String>) readFile("searches.ser");
-		System.out.println("Read complete! Search size = " + searches.size());
+		Object o = readFile("searches.ser");
+		if (o != null) {
+			searches = (HashMap<String, String>) o;
+			System.out.println("Read complete! Search size = " + searches.size());
+		} else {
+			System.out.println("File not found, initialized as empty.");
+		}
 	}
 	
 	static void saveSearch() {

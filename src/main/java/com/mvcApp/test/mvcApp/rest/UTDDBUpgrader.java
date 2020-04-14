@@ -1,4 +1,5 @@
 package com.mvcApp.test.mvcApp.rest;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -195,7 +196,6 @@ public class UTDDBUpgrader {
 			}
 		}
 		profToRating.put(prof, rating);
-		saveProfToRating();
 		return rating;
 	}
 	

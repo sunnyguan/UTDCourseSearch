@@ -74,7 +74,7 @@ public class HelloRestController {
 		
 		ArrayList<Roommate> comp = new ArrayList<Roommate>();
 		for(Roommate r2 : roommates) {
-			if(r.getDiff(r2) == 0 || r.name == "IMatch WithEveryone") {
+			if(!r2.equals(r) && (r.getDiff(r2) == 0 || r2.name.equals("IMatch WithEveryone"))) {
 				comp.add(r2);
 			}
 		}

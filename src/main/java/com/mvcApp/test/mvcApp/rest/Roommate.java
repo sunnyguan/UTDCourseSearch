@@ -24,7 +24,7 @@ public class Roommate implements java.io.Serializable {
 	
 	static String[] genderMap = new String[] {"", "Male", "Female", "Other"};
 	static String[] wakeMap = new String[] {"", "", "", "Before 4 AM", "4 AM", "5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "After 10 AM"};
-	static String[] sleepMap = new String[] {"", "", "", "", "", "", "", "Before 8 PM", "8 PM", "9 PM", "10 PM", "11 PM", "12 AM", "1 AM", "2 AM", "After 2 AM"};
+	static String[] sleepMap = new String[] {"", "1 AM", "2 AM", "After 2 AM", "", "", "", "Before 8 PM", "8 PM", "9 PM", "10 PM", "11 PM", "12 AM"};
 	static String[] partyMap = new String[] {"", "1 (Introvert)", "2 (Not introverted, but not a big extrovert)", "3 (Extrovert)"};
 	static String[] politicsMap = new String[] {"No Preference", "Democrat", "Moderate", "Republican", "Independent"};
 	static String[] religionMap = new String[] {"No Preference", "Christian", "Islamic", "Hinduism", "Buddhism", "Athiest"};

@@ -1,0 +1,197 @@
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="qfc-dark.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/siwalikm/quick-form-css@2.2.2/qfc-dark.css">
+
+</head>
+
+<body>
+	<div class="qfc-container">
+		<h3>Roommate Questionaire V2.0</h3>
+		<label>Questionaire for Roommate Search! (currently testing)</label>
+		<form action="/result">
+			<div>
+				<div>
+					<input placeholder="Full Name" type="text" name="name" required>
+				</div>
+				<div>
+					<input placeholder="Email Address" name="email" type="email" required>
+				</div>
+				<BR>
+				<div>
+					<label>Gender</label> <select id name="gender">
+						<option disabled selected value="--">Gender</option>
+						<option value="1">Male</option>
+						<option value="2">Female</option>
+						<option value="3">Other</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Gender</label> <select id name="gender_o">
+						<option disabled selected value="--">Gender</option>
+						<option value="1">Male</option>
+						<option value="2">Female</option>
+						<option value="3">Other</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+				
+				<div>
+					<label>Wake Time</label> <select id name="wake">
+						<option disabled selected value="--">Select A Time</option>
+						<option value="3">Before 4 AM</option>
+						<option value="4">4 AM</option>
+						<option value="5">5 AM</option>
+						<option value="6">6 AM</option>
+						<option value="7">7 AM</option>
+						<option value="8">8 AM</option>
+						<option value="9">9 AM</option>
+						<option value="10">10 AM</option>
+						<option value="11">After 10 AM</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Wake Time</label> <select id name="wake_o">
+						<option disabled selected value="--">Select A Time</option>
+						<option value="3">Before 4 AM</option>
+						<option value="4">After 4 AM</option>
+						<option value="5">After 5 AM</option>
+						<option value="6">After 6 AM</option>
+						<option value="7">After 7 AM</option>
+						<option value="8">After 8 AM</option>
+						<option value="9">After 9 AM</option>
+						<option value="10">After 10 AM</option>
+						<option value="11">After 10 AM</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+				
+				<div>
+					<label>Sleep Time</label> <select id name="sleep">
+						<option disabled selected value="--">Select A Time</option>
+						<option value="7">Before 8 PM</option>
+						<option value="8">8 PM</option>
+						<option value="9">9 PM</option>
+						<option value="10">10 PM</option>
+						<option value="11">11 PM</option>
+						<option value="12">12 AM</option>
+						<option value="1">1 AM</option>
+						<option value="2">2 AM</option>
+						<option value="3">After 2 AM</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Sleep Time</label> <select id name="sleep_o">
+						<option disabled selected value="--">Select A Time</option>
+						<option value="7">Before 8 PM</option>
+						<option value="8">Before 8 PM</option>
+						<option value="9">Before 9 PM</option>
+						<option value="10">Before 10 PM</option>
+						<option value="11">Before 11 PM</option>
+						<option value="12">Before 12 AM</option>
+						<option value="1">Before 1 AM</option>
+						<option value="2">Before 2 AM</option>
+						<option value="3">After 2 AM</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+				<div>
+					<label>Extrovert or Parties</label> <select id name="party">
+						<option disabled selected value="--">Select A Level</option>
+						<option value="1">1 (Extreme Introvert)</option>
+						<option value="2">2 (Not introverted, but not a huge party person)</option>
+						<option value="3">3 (Goes to every party)</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Extrovert or Parties</label> <select id name="party_o">
+						<option disabled selected value="--">Select A Level</option>
+						<option value="1">1 (Extreme Introvert)</option>
+						<option value="2">2 (Not introverted, but not a huge party person)</option>
+						<option value="3">3 (Goes to every party)</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+				<div>
+					<label>Political View</label> <select id name="politics">
+						<option disabled selected value="--">Select An Option</option>
+						<option value="1">Democrat</option>
+						<option value="2">Moderate</option>
+						<option value="3">Republican</option>
+						<option value="4">Independent</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Political View</label> <select id name="politics_o">
+						<option disabled selected value="--">Select An Option</option>
+						<option value="1">Democrat</option>
+						<option value="2">Moderate</option>
+						<option value="3">Republican</option>
+						<option value="4">Independent</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+				<div>
+					<label>Religious Views</label> <select id name="religion">
+						<option disabled selected value="--">Select An Option</option>
+						<option value="1">Christian</option>
+						<option value="2">Islamic</option>
+						<option value="3">Hinduism</option>
+						<option value="4">Buddhism</option>
+						<option value="5">Atheist</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<div>
+					<label>Preferred Roommate's Religious Views</label> <select id name="religion_o">
+						<option disabled selected value="--">Select An Option</option>
+						<option value="1">Christian</option>
+						<option value="2">Islamic</option>
+						<option value="3">Hinduism</option>
+						<option value="4">Buddhism</option>
+						<option value="5">Atheist</option>
+						<option value="0">No Preference</option>
+					</select>
+				</div>
+				<BR>
+<!-- 				<div> -->
+<!-- 					<div> -->
+<!-- 						<input type="checkbox" checked="checked"> <label>Party</label> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+				<div>
+					<label>Anything Else?</label>
+					<div>
+						<textarea placeholder="(Addition comments, suggestions for this form, etc)"></textarea>
+					</div>
+				</div>
+				<div>
+					<button type="submit">Submit</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+<div style="padding-bottom: 15px; font-family: 'Roboto'; color: white;"
+	align="center">
+	made with <span style="color: #e25555;">❤</span> by <a target="_blank"
+		href="https://twitter.com/siwalik">@siwalik</a> and the <a
+		target="_blank"
+		href="https://github.com/siwalikm/quick-form-css/graphs/contributors">internet</a>
+</div>
+<style>
+a {
+	color: #00bcd4;
+	text-decoration: none;
+}
+</style>
+</html>

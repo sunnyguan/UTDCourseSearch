@@ -8,12 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,8 +38,9 @@ public class HelloRestController {
 	static HashMap<String, String> searches = new HashMap<String, String>();
 	static HashMap<String, String> profToRating = new HashMap<String, String>();
 	static HashMap<String, String> profToGPA = new HashMap<String, String>();
+	static ArrayList<Roommate> roommates = new ArrayList<Roommate>();
 	
-	@Scheduled(cron = "0 1 1 * * ?")
+	// @Scheduled(cron = "0 1 1 * * ?")
 	public void scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 	    new UTDDBUpgrader().run();
 	    readSearches();
@@ -47,8 +48,78 @@ public class HelloRestController {
 	}
 	
 	@RequestMapping("/")
+	public String roommateSearch() {
+		return "room.html";
+	}
+	
+	@RequestMapping("/search")
 	public String index() {
 		return "index.html";
+	}
+	
+	@RequestMapping("/result")
+	public ModelAndView result(@RequestParam String name, @RequestParam String email, @RequestParam int gender, @RequestParam int gender_o, @RequestParam int wake, @RequestParam int wake_o, @RequestParam int sleep, @RequestParam int sleep_o, @RequestParam int party, @RequestParam int party_o, @RequestParam int politics, @RequestParam int politics_o, @RequestParam int religion, @RequestParam int religion_o) {
+		System.out.println(profToRating.size());
+		long t = System.currentTimeMillis();
+		
+		roommates = (ArrayList<Roommate>) readFile("roommates.ser");
+		if(roommates == null) roommates = new ArrayList<Roommate>();
+		Roommate r = new Roommate(name, email, gender, gender_o, wake, wake_o, sleep, sleep_o, party, party_o, politics, politics_o, religion, religion_o);
+		if(!roommates.contains(r)) {
+			roommates.add(r);
+		} else {
+			roommates.remove(r);
+			roommates.add(r);
+		}
+		
+		ArrayList<Roommate> comp = new ArrayList<Roommate>();
+		for(Roommate r2 : roommates) {
+			if(r.getDiff(r2) == 0 || r.name == "IMatch WithEveryone") {
+				comp.add(r2);
+			}
+		}
+		
+		String output = "<table style=\"width: 100%;\" id=\"professors\">"
+				+ "<thead><tr data-sort-method=\"none\">"
+				+ "<th>Name</th>"
+				+ "<th>Email</th>"
+				+ "<th>Gender</th>"
+				+ "<th>Wake Time</th>"
+				+ "<th>Sleep Time</th>"
+				+ "<th>Party Rank</th>"
+				+ "<th>Political View</th>"
+				+ "<th>Religious View</th>"
+				+ "</tr></thead>";
+		
+		for(Roommate r2 : comp) {
+			output += "<tr>";
+			output += "<td>" + r2.getName() + "</td>";
+			output += "<td>" + r2.getEmail() + "</td>";
+			output += "<td>" + Roommate.genderMap[r2.getGender()] + "</td>";
+			output += "<td>" + Roommate.wakeMap[r2.getWake()] + "</td>";
+			output += "<td>" + Roommate.sleepMap[r2.getSleep()] + "</td>";
+			output += "<td>" + Roommate.partyMap[r2.getParty()] + "</td>";
+			output += "<td>" + Roommate.politicsMap[r2.getPolitics()] + "</td>";
+			output += "<td>" + Roommate.religionMap[r2.getReligion()] + "</td>";
+			output += "</tr>";
+		}
+		
+		output += "</table>";
+		
+		saveFile("roommates.ser", roommates);
+		System.out.println("Writing new roommate success, size: " + roommates.size() + ", newest: " + r.name);
+		
+		double time = (System.currentTimeMillis() - t);
+		ModelAndView model = new ModelAndView("/resultTemp");
+		model.addObject("time", time);
+		model.addObject("numRoommates", roommates.size());
+		model.addObject("output", output);
+		return model;
+	}
+	
+	@RequestMapping("/resultTemp")
+	public String resultTemp() {
+		return "result.jsp";
 	}
 	
 	@RequestMapping("/home")

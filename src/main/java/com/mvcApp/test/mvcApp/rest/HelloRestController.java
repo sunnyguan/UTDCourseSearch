@@ -32,7 +32,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 @Controller
 public class HelloRestController {
 
-	final boolean FORCENEW = false;
+	final boolean FORCENEW = true;
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 	
 	static HashMap<String, String> searches = new HashMap<String, String>();
@@ -41,6 +41,7 @@ public class HelloRestController {
 	static ArrayList<Roommate> roommates = new ArrayList<Roommate>();
 	
 	// @Scheduled(cron = "0 1 1 * * ?")
+	@RequestMapping("/updateDB")
 	public void scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 	    new UTDDBUpgrader().run();
 	    readSearches();
@@ -50,6 +51,11 @@ public class HelloRestController {
 	@RequestMapping("/room")
 	public String roommateSearch() {
 		return "room.html";
+	}
+	
+	@RequestMapping("/memoryCheck")
+	public String memoryCheck() {
+		return "" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 1.0 / 1024 / 1024;
 	}
 	
 	@RequestMapping("/")
@@ -315,6 +321,7 @@ public class HelloRestController {
 										.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
 								
 								rmp = a.click();
+								String tid = rmp.getUrl().toString().split("=")[1];
 								rating = ((HtmlDivision) rmp
 										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
 												.asText();
@@ -326,6 +333,8 @@ public class HelloRestController {
 								} else {
 									rating = "0 Ratings Found";
 								}
+								
+								rating += "@@" + tid;
 								
 								profToRating.put(prof, rating);
 								saveProfToRating();
@@ -349,7 +358,7 @@ public class HelloRestController {
 				
 				String overallRating = "0 (N/A)";
 				double gpaWeight = 70;
-				if(rating.contains("based on") && !avgGPA.contentEquals("N/A")) {
+				if(rating.contains("based on") && !avgGPA.contentEquals("N/A") && !avgGPA.contains("0 Records Found")) {
 					double info0 = 2;
 					try {
 						info0 = Double.parseDouble(avgGPA.split(" ")[0]);
@@ -393,8 +402,11 @@ public class HelloRestController {
 					output += "<td>" + rating + "</td>";
 				} else {
 					String add = "";
+					String gtid = "";
 					try {
 						double r = Double.parseDouble(rating.split(" ")[0]);
+						gtid = rating.split("@@")[1];
+						rating = rating.split("@@")[0];
 						add = " class='";
 						if(r <= 2.5) {
 							add += "uhoh'";
@@ -404,10 +416,10 @@ public class HelloRestController {
 							add += "normal'";
 						}
 					}catch(Exception e) {}
-					output += "<td" + add + ">" + rating + "</td>";
+					output += "<td" + add + "><a href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
 				}
 				
-				output += "<td>" + avgGPA + "</td>";
+				output += "<td><a href=\"https://utdgrades.com/results?search=" + prof + "\">" + avgGPA + "</a></td>";
 				
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				

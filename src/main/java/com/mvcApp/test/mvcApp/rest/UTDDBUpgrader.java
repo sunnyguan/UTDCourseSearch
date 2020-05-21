@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,8 +112,8 @@ public class UTDDBUpgrader {
 		int i = 0;
 		for (Map.Entry<String, String> s : profToRating.entrySet()) {
 			String name = s.getKey();
-			System.out.println("Updating professor " + padRight(i++ + "", 5) + "/" + profToRating.size() + ": " + name);
 			String newOutput = rating(name);
+			System.out.println("Updating professor " + padRight(i++ + "", 5) + "/" + profToRating.size() + ": " + padRight(name, 40) + " --> " + newOutput);
 			newProfToRating.put(name, newOutput);
 		}
 		profToRating = newProfToRating;
@@ -181,6 +182,7 @@ public class UTDDBUpgrader {
 							.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
 					
 					rmp = a.click();
+					String tid = rmp.getUrl().toString().split("=")[1];
 					rating = ((HtmlDivision) rmp
 							.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
 									.asText();
@@ -192,6 +194,7 @@ public class UTDDBUpgrader {
 					} else {
 						rating = "0 Ratings Found";
 					}
+					rating += "@@" + tid;
 				} catch (Exception e) {}
 			}
 		}
@@ -200,6 +203,210 @@ public class UTDDBUpgrader {
 	}
 	
 	public String newSearch(String course, String term) {
+		System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
+		
+		String output = "<table style=\"width: 100%;\" id=\"professors\">"
+				+ "<colgroup>\r\n" + 
+				"       <col span=\"1\" style=\"width: 5%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 8%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 17%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
+				"  </colgroup>"
+				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
+				+ "<th>Course</th>"
+				+ "<th>Name</th>"
+				+ "<th>Professor</th>"
+				+ "<th>Rating</th>"
+				+ "<th>Avg. GPA</th>"
+				+ "<th>Overall</th>"
+				+ "<th>Schedule</th></tr></thead>";
+
+		// String term = "term_20f?";
+
+		String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
+
+		WebClient client = new WebClient();
+		client.getOptions().setCssEnabled(false);
+		client.getOptions().setJavaScriptEnabled(false);
+		
+		profToRating.put("-Staff-", "0 Ratings Found");
+		try {
+			String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;
+			HtmlPage page = client.getPage(searchUrl);
+
+			List l = page.getByXPath("//*/td[4]");
+
+			for (int section = 1; section <= l.size(); section++) {
+				long timeTrack = System.currentTimeMillis();
+				
+				HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
+				
+				HtmlSpan openSpan = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+				String open = "Unknown";
+				if(openSpan != null) open = openSpan.asText();
+				
+				String name = tr.getCell(2).asText();
+				
+				String prof = tr.getCell(3).asText();
+				// add multiple professor support
+				if(prof.contains(",")) prof = prof.split(",")[0];
+				// System.out.println("trimmed from: " + tr.getCell(2).asText() + " to " + prof);
+				
+				String time = tr.getCell(4).asText();
+
+				String rating = "0 Ratings Found";
+				
+				if(!profToRating.containsKey(prof)) {
+					System.out.println("Uh oh, checking web...:" + prof);
+					if (!prof.toLowerCase().contains("staff")) {
+						// Rate My Professor Scan
+						String url = "https://www.ratemyprofessors.com/search.jsp?query=" + prof;
+						HtmlPage rmp = client.getPage(url);
+						// *[@id="searchResultsBox"]/div[2]/ul/li[1]/a/span[2]/span[2]
+						// *[@id="searchResultsBox"]/div[2]/ul/li[2]/a/span[2]/span[2]
+						HtmlUnorderedList allProfs = (HtmlUnorderedList) rmp
+								.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
+						int index = -1;
+						
+						if(allProfs != null) {
+							for (int i = 1; i <= allProfs.getChildElementCount(); i++) {
+								HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
+										"//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
+								if (school != null && school.asText().contains("The University of Texas at Dallas")) {
+									index = i;
+									break;
+								}
+							}
+
+							try {
+								HtmlAnchor a = (HtmlAnchor) rmp
+										.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
+								
+								rmp = a.click();
+								String tid = rmp.getUrl().toString().split("=")[1];
+								rating = ((HtmlDivision) rmp
+										.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]"))
+												.asText();
+								
+								if(!rating.contains("N/A")) {
+									rating += " based on " + ((HtmlAnchor) rmp
+											.getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
+													.asText();
+								} else {
+									rating = "0 Ratings Found";
+								}
+								
+								rating += "@@" + tid;
+								
+								profToRating.put(prof, rating);
+								saveProfToRating();
+							} catch (Exception e) {
+								profToRating.put(prof, rating);
+								saveProfToRating();
+							}
+						} else {
+							profToRating.put(prof, rating);
+							saveProfToRating();
+						}
+					}
+				} else {
+					rating = profToRating.get(prof);
+				}
+				
+				String avgGPA = "0 Records Found";
+				if(profToGPA.containsKey(prof)) {
+					avgGPA = profToGPA.get(prof);
+				}
+				
+				String overallRating = "0 (N/A)";
+				double gpaWeight = 70;
+				if(rating.contains("based on") && !avgGPA.contentEquals("N/A")) {
+					double info0 = 2;
+					try {
+						info0 = Double.parseDouble(avgGPA.split(" ")[0]);
+					} catch (Exception e) {}
+					double scores = Double.parseDouble(rating.split(" ")[0]) / 5 * (100 - gpaWeight) + info0 / 4 * gpaWeight;
+					scores = (double) Math.round(scores * 100d) / 100d; // adjust scaling !
+					overallRating = scores + "";
+				}
+				
+				String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
+				
+				HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
+				String url = a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
+				
+				String sect = "N/A";
+				try {
+					String[] cc = url.split("\\.")[0].split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+					sect = cc[0].toUpperCase() + " " + cc[1]; 
+				} catch (Exception e) {}
+
+				
+				/*if(rating.contains("No")) {
+					output += "<tr data-sort-method='none'>";
+				}*/
+				
+				output += "<tr>";
+				
+				output += "<td>" + open + "</td>";
+				
+				output += "<td>" + sect + "</td>";
+				
+				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
+				if (name.contains("CV Honors"))
+					output += "<b>" + formatName + "</b></a></td>";
+				else
+					output += formatName + "</a></td>";
+				output += "<td>" + prof + "</td>";
+				
+				// System.out.println("Rating: " + rating);
+				if(rating.contains("0 Ratings")) {
+					output += "<td>" + rating + "</td>";
+				} else {
+					String add = "";
+					String gtid = "";
+					try {
+						double r = Double.parseDouble(rating.split(" ")[0]);
+						gtid = rating.split("@@")[1];
+						rating = rating.split("@@")[0];
+						add = " class='";
+						if(r <= 2.5) {
+							add += "uhoh'";
+						} else if(r >= 4.5) {
+							add += "ahhh'";
+						} else {
+							add += "normal'";
+						}
+					}catch(Exception e) {}
+					output += "<td" + add + "><a href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
+				}
+				
+				output += "<td><a href=\"https://utdgrades.com/results?search=" + prof + "\">" + avgGPA + "</a></td>";
+				
+				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
+				
+				output += "<td>" + time + "</td>";
+				output += "</tr>";
+				
+				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
+			}
+			
+			output += "</table>";
+			
+			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return output;
+	}
+	
+	public String newSearch_old(String course, String term) {
 		// System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
 		
 		String output = "<table style=\"width: 100%;\" id=\"professors\">"
@@ -248,7 +455,7 @@ public class UTDDBUpgrader {
 				String prof = tr.getCell(3).asText();
 				String time = tr.getCell(4).asText();
 
-				String currentRating = rating(prof); // always check web since we're updating DB
+				String currentRating = "0 Ratings Found"; // always check web since we're updating DB
 				
 				String avgGPA = "N/A";
 				if(profToGPA.containsKey(prof)) 

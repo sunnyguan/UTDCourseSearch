@@ -47,18 +47,18 @@ public class HelloRestController {
 		readProfToRating();
 	}
 	
-	@RequestMapping("/")
+	@RequestMapping("/room")
 	public String roommateSearch() {
 		return "room.html";
 	}
 	
-	@RequestMapping("/search")
+	@RequestMapping("/")
 	public String index() {
 		return "index.html";
 	}
 	
 	@RequestMapping("/result")
-	public ModelAndView result(@RequestParam String name, @RequestParam String email, @RequestParam int gender, @RequestParam int gender_o, @RequestParam int wake, @RequestParam int wake_o, @RequestParam int sleep, @RequestParam int sleep_o, @RequestParam int party, @RequestParam int party_o, @RequestParam int politics, @RequestParam int politics_o, @RequestParam int religion, @RequestParam int religion_o) {
+	public ModelAndView result(@RequestParam String name, @RequestParam String email, @RequestParam int gender, @RequestParam int gender_o, @RequestParam int wake, @RequestParam int wake_o, @RequestParam int sleep, @RequestParam int sleep_o, @RequestParam int party, @RequestParam int party_o, @RequestParam int politics, @RequestParam String politics_o, @RequestParam int religion, @RequestParam String religion_o) {
 		System.out.println(profToRating.size());
 		long t = System.currentTimeMillis();
 		
@@ -250,7 +250,7 @@ public class HelloRestController {
 				+ "<th>Professor</th>"
 				+ "<th>Rating</th>"
 				+ "<th>Avg. GPA</th>"
-				+ "<th>SG Rank</th>"
+				+ "<th>Overall</th>"
 				+ "<th>Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
@@ -337,12 +337,12 @@ public class HelloRestController {
 					rating = profToRating.get(prof);
 				}
 				
-				String avgGPA = "N/A";
+				String avgGPA = "0 Records Found";
 				if(profToGPA.containsKey(prof)) {
 					avgGPA = profToGPA.get(prof);
 				}
 				
-				String overallRating = "N/A";
+				String overallRating = "0 (N/A)";
 				double gpaWeight = 70;
 				if(rating.contains("based on") && !avgGPA.contentEquals("N/A")) {
 					double info0 = 2;
@@ -404,7 +404,7 @@ public class HelloRestController {
 				
 				output += "<td>" + avgGPA + "</td>";
 				
-				output += "<td data-sort-method='number'>" + overallRating + "</td>";
+				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
 				output += "<td>" + time + "</td>";
 				output += "</tr>";

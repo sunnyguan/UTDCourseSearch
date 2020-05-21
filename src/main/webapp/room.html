@@ -2,10 +2,20 @@
 
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="qfc-dark.css">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/gh/siwalikm/quick-form-css@2.2.2/qfc-dark.css">
-
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#submit').click(function(event) {
+			$( "select.multiple" ).each(function() {
+		      str = $( this ).val() + " ";
+		      $(this).find('option:selected').remove();
+		      $(this).append("<option selected='selected' class='hidden' value=" + str + ">added</option>");
+		    });
+		});
+	});
+</script>
 </head>
 
 <body>
@@ -120,8 +130,7 @@
 				</div>
 				<BR>
 				<div>
-					<label>Political View</label> <select id name="politics">
-						<option disabled selected value="--">Select An Option</option>
+					<label>Political View</label> <select name="politics">
 						<option value="1">Democrat</option>
 						<option value="2">Moderate</option>
 						<option value="3">Republican</option>
@@ -130,8 +139,7 @@
 					</select>
 				</div>
 				<div>
-					<label>Preferred Roommate's Political View</label> <select id name="politics_o">
-						<option disabled selected value="--">Select An Option</option>
+					<label>Preferred Roommate's Political View</label> <select multiple class="multiple" name="politics_o">
 						<option value="1">Democrat</option>
 						<option value="2">Moderate</option>
 						<option value="3">Republican</option>
@@ -141,8 +149,7 @@
 				</div>
 				<BR>
 				<div>
-					<label>Religious Views</label> <select id name="religion">
-						<option disabled selected value="--">Select An Option</option>
+					<label>Religious Views</label> <select name="religion">
 						<option value="1">Christian</option>
 						<option value="2">Islamic</option>
 						<option value="3">Hinduism</option>
@@ -152,8 +159,7 @@
 					</select>
 				</div>
 				<div>
-					<label>Preferred Roommate's Religious Views</label> <select id name="religion_o">
-						<option disabled selected value="--">Select An Option</option>
+					<label>Preferred Roommate's Religious Views</label> <select multiple class="multiple" name="religion_o">
 						<option value="1">Christian</option>
 						<option value="2">Islamic</option>
 						<option value="3">Hinduism</option>
@@ -175,7 +181,7 @@
 					</div>
 				</div>
 				<div>
-					<button type="submit">Submit</button>
+					<button id="submit" type="submit">Submit</button>
 				</div>
 			</div>
 		</form>

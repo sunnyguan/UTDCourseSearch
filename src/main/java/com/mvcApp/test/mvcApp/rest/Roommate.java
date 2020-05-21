@@ -1,6 +1,7 @@
 package com.mvcApp.test.mvcApp.rest;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Roommate implements java.io.Serializable {
 	/**
@@ -18,9 +19,9 @@ public class Roommate implements java.io.Serializable {
 	int party;
 	int party_o;
 	int politics;
-	int politics_o;
+	List<String> politics_o;
 	int religion;
-	int religion_o;
+	List<String> religion_o;
 	
 	static String[] genderMap = new String[] {"", "Male", "Female", "Other"};
 	static String[] wakeMap = new String[] {"", "", "", "Before 4 AM", "4 AM", "5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "After 10 AM"};
@@ -30,7 +31,7 @@ public class Roommate implements java.io.Serializable {
 	static String[] religionMap = new String[] {"No Preference", "Christian", "Islamic", "Hinduism", "Buddhism", "Athiest"};
 	
 	public Roommate(String name, String email, int gender, int gender_o, int wake, int wake_o, int sleep, int sleep_o,
-			int party, int party_o, int politics, int politics_o, int religion, int religion_o) {
+			int party, int party_o, int politics, String politics_o, int religion, String religion_o) {
 		super();
 		this.name = name;
 		this.email = email;
@@ -43,9 +44,9 @@ public class Roommate implements java.io.Serializable {
 		this.party = party;
 		this.party_o = party_o;
 		this.politics = politics;
-		this.politics_o = politics_o;
+		this.politics_o = Arrays.asList(politics_o.split(","));
 		this.religion = religion;
-		this.religion_o = religion_o;
+		this.religion_o = Arrays.asList(religion_o.split(","));
 	}
 
 	public int getGender() {
@@ -92,7 +93,7 @@ public class Roommate implements java.io.Serializable {
 		return politics;
 	}
 
-	public int getPolitics_o() {
+	public List<String> getPolitics_o() {
 		return politics_o;
 	}
 
@@ -100,7 +101,7 @@ public class Roommate implements java.io.Serializable {
 		return religion;
 	}
 
-	public int getReligion_o() {
+	public List<String> getReligion_o() {
 		return religion_o;
 	}
 
@@ -131,14 +132,14 @@ public class Roommate implements java.io.Serializable {
 		else if (r2.party_o != 0 && party != r2.party_o)
 			return -2;
 		
-		if(politics_o != 0 && r2.politics != politics_o)
+		if(!politics_o.get(0).equals("0") && !politics_o.contains(r2.politics+""))
 			return -1;
-		else if (r2.politics_o != 0 && politics < r2.politics_o)
+		else if(!r2.politics_o.get(0).equals("0") && !r2.politics_o.contains(politics+""))
 			return -2;
 		
-		if(religion_o != 0 && r2.religion < religion_o)
+		if(!religion_o.get(0).equals("0") && !religion_o.contains(r2.religion+""))
 			return -1;
-		else if (r2.religion_o != 0 && religion < r2.religion_o)
+		else if(!r2.religion_o.get(0).equals("0") && !r2.religion_o.contains(religion+""))
 			return -2;
 		
 		return 0;

@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>First JSP</title>
+<title>${course} Results</title>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-167312978-1"></script>
 <script>

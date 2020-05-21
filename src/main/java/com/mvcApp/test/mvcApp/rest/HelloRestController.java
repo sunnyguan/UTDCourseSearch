@@ -278,7 +278,12 @@ public class HelloRestController {
 				if(openSpan != null) open = openSpan.asText();
 				
 				String name = tr.getCell(2).asText();
+				
 				String prof = tr.getCell(3).asText();
+				// add multiple professor support
+				if(prof.contains(",")) prof = prof.split(",")[0];
+				// System.out.println("trimmed from: " + tr.getCell(2).asText() + " to " + prof);
+				
 				String time = tr.getCell(4).asText();
 
 				String rating = "0 Ratings Found";

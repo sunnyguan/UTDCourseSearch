@@ -1,12 +1,6 @@
 <html>
 <head>
 <title>First JSP</title>
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-167312978-1"></script>
 <script>
@@ -16,6 +10,11 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
   gtag('config', 'UA-167312978-1');
 </script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+<link href="main.css" rel="stylesheet" type="text/css">
+<script src="js/tablesort.js"></script>
+<script src="js/sorts/tablesort.number.js"></script>
 
 <script>
 	function onPageReady() {

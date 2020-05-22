@@ -16,7 +16,13 @@
 <link href="css/tablesort.css" rel="stylesheet" type="text/css">
 <script src="js/tablesort.js"></script>
 <script src="js/sorts/tablesort.number.js"></script>
-<script src="js/jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<!-- Magnific Popup core CSS file -->
+<link rel="stylesheet" href="magnific-popup/magnific-popup.css">
+<!-- Magnific Popup core JS file -->
+<script src="magnific-popup/jquery.magnific-popup.min.js"></script>
+
+
 <script>
 	function onPageReady() {
 		// Documentation: http://tristen.ca/tablesort/demo/
@@ -28,6 +34,29 @@
 		        
 		    }).toggle();
 		});
+		
+		$('.popup_grade').each(function() {
+			$(this).magnificPopup({
+				  type: 'iframe',
+				  iframe: {
+				     markup: '<div class="mfp-iframe-scaler">'+
+				                '<div class="mfp-close"></div>'+
+				                '<iframe style="height: 600px;" src=' + $(this).attr("href") + '></iframe>'
+				  }
+			});
+		});
+		
+		$('.popup_rmp').each(function() {
+			$(this).magnificPopup({
+				  type: 'iframe',
+				  iframe: {
+				     markup: '<div class="mfp-iframe-scaler">'+
+				                '<div class="mfp-close"></div>'+
+				                '<iframe style="height: 600px;" src=' + $(this).attr("href") + '></iframe>'
+				  }
+			});
+		});
+		
 	}
 
 	// Run the above function when the page is loaded & ready
@@ -45,14 +74,14 @@
 	<h2>Search Result for: ${course}</h2>
 	<p>Time taken: ${time} seconds, Number of Professors in Database: ${numProfs}</p>
     <p>Filter Open Classes Only:
-    <div class="onoffswitch">
+    <div class="onoffswitch"></p>
         <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0" >
         <label class="onoffswitch-label" for="myonoffswitch">
             <span class="onoffswitch-inner"></span>
             <span class="onoffswitch-switch"></span>
         </label>
     </div>
-    </p>
+    <a class="grades" href="tefst">Open popup</a>
 	${output}
 	
 </body>

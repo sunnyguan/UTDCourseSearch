@@ -292,7 +292,9 @@ public class HelloRestController {
 				
 				String prof = tr.getCell(3).asText();
 				// add multiple professor support
-				if(prof.contains(",")) prof = prof.split(",")[0];
+				if(prof.contains(",")) {
+					prof = prof.split(",")[0].trim();
+				}
 				// System.out.println("trimmed from: " + tr.getCell(2).asText() + " to " + prof);
 				
 				String time = tr.getCell(4).asText();
@@ -421,10 +423,21 @@ public class HelloRestController {
 							add += "normal'";
 						}
 					}catch(Exception e) {}
-					output += "<td" + add + "><a href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
+					output += "<td" + add + "><a class='popup_rmp' href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
 				}
 				
-				output += "<td><a href=\"https://utdgrades.com/results?search=" + prof + "\">" + avgGPA + "</a></td>";
+				// UTDGrades IFrame info: $('.grades').magnificPopup({
+				// https://saitanayd.github.io/utd-grades/?subj=GOVT&num=2305&prof=Travis Hadley
+				String subj = sect.split(" ")[0];
+				String num = sect.split(" ")[1];
+				String pr = prof.contains("Staff") ? "" : prof;
+				String searchString = "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof=" + pr;
+				
+				if(avgGPA.contains("0 Records")) {
+					output += "<td>" + avgGPA + "</td>";
+				} else {
+					output += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
+				}
 				
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				

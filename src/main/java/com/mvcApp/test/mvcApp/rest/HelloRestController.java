@@ -3,6 +3,9 @@ package com.mvcApp.test.mvcApp.rest;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
@@ -80,17 +83,41 @@ public class HelloRestController {
 	}
 	
 	@RequestMapping("rmp")
-	public ModelAndView rmp(@RequestParam String course, @RequestParam String term) {
+	public ModelAndView rmp(@RequestParam String course, @RequestParam String term, HttpSession session) {
 		long t = System.currentTimeMillis();
 		String output = UTDDB.rmp(course, term);
 		double time = (System.currentTimeMillis() - t);
 		System.out.println("Completed Request in " + time/1000.0 + " seconds.");
 		
+		ArrayList<String> hist = (ArrayList<String>) session.getAttribute("history");
+		if(hist == null) hist = new ArrayList<String>();
+		hist.add(course + "@@" + term);
+		session.setAttribute("history", hist);
+		
+		String searchHistory = "";
+		for(String s : hist) {
+			String c1 = s.split("@@")[0];
+			String c2 = s.split("@@")[1];
+			String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
+			searchHistory += cct + ", ";
+		}
+		
 		ModelAndView model = new ModelAndView("/home");
 		model.addObject("output", output);
 		model.addObject("course", course);
 		model.addObject("time", time / 1000.0);
+		model.addObject("history", searchHistory);
 		model.addObject("numProfs", UTDDB.getProfs());
 		return model;
 	}
+	
+	@RequestMapping("/clear_history")
+	@ResponseBody
+	public String clear_history(HttpSession session) {
+		ArrayList<String> hist = (ArrayList<String>) session.getAttribute("history");
+		if(hist != null && hist.size() != 0) hist = new ArrayList<String>();
+		session.setAttribute("history", hist);
+		return "";
+	}
+	
 }

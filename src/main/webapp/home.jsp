@@ -47,6 +47,13 @@
 				    });
 				});
 				
+				$('th').on('click', function() {
+					$('tbody tr:visible').each(function(index) {
+				        if(index % 2 == 1) $(this).css({"background-color": "#161f27"});
+				        else $(this).css({"background-color": "#202b38"});
+				    });
+				});
+				
 				$('.popup_grade').each(function() {
 					$(this).magnificPopup({
 						  type: 'iframe',
@@ -72,6 +79,17 @@
 			}
 			
 			document.addEventListener('DOMContentLoaded', onPageReady, false);
+			
+			function loadDoc() {
+			  var xhttp = new XMLHttpRequest();
+			  xhttp.onreadystatechange=function() {
+			    if (this.readyState == 4 && this.status == 200) {
+			      document.getElementById("search_history").innerHTML = "";
+			    }
+			  };
+			  xhttp.open("GET", "clear_history", true);
+			  xhttp.send();
+			}
 		</script>
 	</head>
 	<body>
@@ -147,8 +165,9 @@
 			</label>
 		</div>
 		${output}
-	<footer>
 		<p>© Made by <a href="https://www.linkedin.com/in/sunny-guan/">Sunny Guan</a>, credit for UTDGrades visualization goes to <a href="https://www.linkedin.com/in/saitanayd/">Sai Desaraju</a>. Tools used: <a href="https://dimsemenov.com/plugins/magnific-popup/">magnific-popup</a>, <a href="https://kognise.github.io/water.css/">water.css</a>, <a href="http://tristen.ca/tablesort/demo/">tablesort</a>.</p>
+	<footer>
+		<p><a id="clearHistory" onclick="loadDoc()">Clear</a>Search History: <span id="search_history"> ${history}</span></p>
 	</footer>
 	</body>
 </html>

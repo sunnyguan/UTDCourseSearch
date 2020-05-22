@@ -91,7 +91,7 @@
 		</label>
 	</div>
 	<br>
-	<div style="display: inline-block; margin-right: 15px;">Toggle Schedule Column:</div>
+	<div style="display: inline-block; margin-right: 15px; margin-bottom:20px;">Toggle Schedule Column:</div>
 	<div class="onoffswitch" style="height: 28px; display: inline-block; vertical-align: middle;">
 		<input type="checkbox" name="onoffswitch2" class="onoffswitch-checkbox"
 			id="myonoffswitch2" tabindex="0"> <label

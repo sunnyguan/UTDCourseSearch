@@ -443,7 +443,7 @@ public class HelloRestController {
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
 				// time shortening
-				String[] timeInfo = time.split("\r\n");
+				String[] timeInfo = time.replaceAll("\r", "\n").split("\n");
 				int i = timeInfo[0].contentEquals("Examination") ? 1 : 0;
 				String timeFormatted = "";
 				for(; i < (timeInfo.length) / 3; i++) {

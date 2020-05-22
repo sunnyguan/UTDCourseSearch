@@ -19,7 +19,6 @@ public class HelloRestController {
 
 	public static final boolean FORCENEW = false;
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-	UTDDB database;
 	
 	// @Scheduled(cron = "0 1 1 * * ?")
 	@RequestMapping("/updateDB")
@@ -94,21 +93,4 @@ public class HelloRestController {
 		model.addObject("numProfs", UTDDB.getProfs());
 		return model;
 	}
-	
-	/*
-	 <%
-    double num = Math.random();
-    if (num > 0.95) {
-  %>
-      <h2>You'll have a luck day!</h2><p>(<%= num %>)</p>
-  <%
-    } else {
-  %>
-      <h2>Well, life goes on ... </h2><p>(<%= num %>)</p>
-  <%
-    }
-  %>
-  <a href="<%= request.getRequestURI() %>"><h3>Try Again!</h3></a>
-	 */
-
 }

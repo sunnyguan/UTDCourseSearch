@@ -320,7 +320,7 @@ public class UTDDB {
 
 		String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
 		long timeTrack = System.currentTimeMillis();
-		
+		if(client == null) init();
 		profToRating.put("-Staff-", no_rmp_data);
 		try {
 			String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;

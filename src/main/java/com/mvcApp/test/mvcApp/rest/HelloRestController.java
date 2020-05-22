@@ -34,7 +34,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 @Controller
 public class HelloRestController {
 
-	final boolean FORCENEW = true;
+	final boolean FORCENEW = false;
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 	
 	static HashMap<String, String> searches = new HashMap<String, String>();
@@ -263,7 +263,7 @@ public class HelloRestController {
 				+ "<th role=\"columnheader\">Professor</th>"
 				+ "<th role=\"columnheader\">Rating</th>"
 				+ "<th role=\"columnheader\">Avg. GPA</th>"
-				+ "<th role=\"columnheader\">Overall</th>"
+				+ "<th role=\"columnheader\"><div class=\"tooltip\">Overall<span class=\"tooltiptext\">30% RMP + 70% GPA</span></div></th>"
 				+ "<th role=\"columnheader\">Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
@@ -440,10 +440,24 @@ public class HelloRestController {
 				} else {
 					output += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
 				}
-				
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
-				output += "<td>" + time + "</td>";
+				// time shortening
+				String[] timeInfo = time.split("\r\n");
+				int i = timeInfo[0].contentEquals("Examination") ? 1 : 0;
+				String timeFormatted = "";
+				for(; i < (timeInfo.length) / 3; i++) {
+					String days = timeInfo[0+i*3];
+					days = days.replace("Tuesday & Thursday", "TTh");
+					days = days.replace("Monday & Wednesday", "MW");
+					days = days.replace("Monday, Wednesday, Friday", "MWF");
+					days = days.replace("Monday & Wednesday", "MW");
+					String timeRange = timeInfo[1+i*3];
+					String location = timeInfo[2+i*3];
+					timeFormatted += days + " " + timeRange + " " + location + "\n";
+				}
+				
+				output += "<td>" + timeFormatted + "</td>";
 				output += "</tr>";
 				
 				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");

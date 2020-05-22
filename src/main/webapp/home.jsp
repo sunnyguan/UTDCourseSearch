@@ -7,7 +7,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'UA-167312978-1');
 </script>
 
@@ -28,11 +27,20 @@
 		// Documentation: http://tristen.ca/tablesort/demo/
 		new Tablesort(document.getElementById('professors'));
 		
+		$('#myonoffswitch2').on('click', function () {
+			$('td:nth-child(8)').toggle();
+			$('th:nth-child(8)').toggle();
+		});
+		
 		$('#myonoffswitch').on('click', function () {
 		    var $rowsNo = $('#professors tbody tr').filter(function () {
 		        return $.trim($(this).find('td').eq(0).text()) === "Full";
 		        
 		    }).toggle();
+		    $('tbody tr:visible').each(function(index) {
+		        if(index % 2 == 1) $(this).css({"background-color": "#161f27"});
+		        else $(this).css({"background-color": "#202b38"});
+		    });
 		});
 		
 		$('.popup_grade').each(function() {
@@ -73,14 +81,24 @@
 
 	<h2>Search Result for: ${course}</h2>
 	<p>Time taken: ${time} seconds, Number of Professors in Database: ${numProfs}</p>
-    <p>Filter Open Classes Only:
-    <div class="onoffswitch"></p>
-        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0" >
-        <label class="onoffswitch-label" for="myonoffswitch">
-            <span class="onoffswitch-inner"></span>
-            <span class="onoffswitch-switch"></span>
-        </label>
-    </div>
+	<div style="margin-bottom:20px; display: inline-block; margin-right: 20px;">Filter Open Classes Only:</div>
+	<div class="onoffswitch"
+		style="height: 28px; display: inline-block; vertical-align: middle;">
+		<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox"
+			id="myonoffswitch" tabindex="0"> <label
+			class="onoffswitch-label" for="myonoffswitch"> <span
+			class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>
+		</label>
+	</div>
+	<br>
+	<div style="display: inline-block; margin-right: 15px;">Toggle Schedule Column:</div>
+	<div class="onoffswitch" style="height: 28px; display: inline-block; vertical-align: middle;">
+		<input type="checkbox" name="onoffswitch2" class="onoffswitch-checkbox"
+			id="myonoffswitch2" tabindex="0"> <label
+			class="onoffswitch-label" for="myonoffswitch2"> <span
+			class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>
+		</label>
+	</div>
     
 	${output}
 	

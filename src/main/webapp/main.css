@@ -1,6 +1,46 @@
 @import url(https://fonts.googleapis.com/css?family=Alegreya+Sans);
 
+.mfp-iframe-holder{
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+LABEL.indented-checkbox-text
+{
+  margin-left: 2em;
+  display: block;
+  position: relative;
+  margin-top: -1.4em;  /* make this margin match whatever your line-height is */
+  line-height: 1.4em;  /* can be set here, or elsewehere */
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 150px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 110%;
+  left: 50%;
+  margin-left: -75px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
 
 body {
 	max-width: 90%;
@@ -10,6 +50,10 @@ body {
 @-webkit-keyframes fontfix {
     from { opacity: 1; }
     to   { opacity: 1; }
+}
+
+td {
+	white-space: pre-line;
 }
 
 th

@@ -34,7 +34,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 @Controller
 public class HelloRestController {
 
-	final boolean FORCENEW = true;
+	final boolean FORCENEW = false;
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 	
 	static HashMap<String, String> searches = new HashMap<String, String>();

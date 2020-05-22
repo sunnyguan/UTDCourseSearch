@@ -81,7 +81,7 @@
             <span class="onoffswitch-switch"></span>
         </label>
     </div>
-    <a class="grades" href="tefst">Open popup</a>
+    
 	${output}
 	
 </body>

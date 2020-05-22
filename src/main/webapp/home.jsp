@@ -147,6 +147,8 @@
 			</label>
 		</div>
 		${output}
-	<p>© Made by <a href="https://www.sguan.me">Sunny Guan</a></p>
+	<footer>
+		<p>© Made by <a href="https://www.linkedin.com/in/sunny-guan/">Sunny Guan</a>, credit for UTDGrades visualization goes to <a href="https://www.linkedin.com/in/saitanayd/">Sai Desaraju</a>. Tools used: <a href="https://dimsemenov.com/plugins/magnific-popup/">magnific-popup</a>, <a href="https://kognise.github.io/water.css/">water.css</a>, <a href="http://tristen.ca/tablesort/demo/">tablesort</a>.</p>
+	</footer>
 	</body>
 </html>

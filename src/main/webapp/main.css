@@ -45,6 +45,7 @@ LABEL.indented-checkbox-text
 body {
 	max-width: 90%;
 	font-family: 'Alegreya Sans';	
+	margin-bottom:50px;
 }
 
 @-webkit-keyframes fontfix {
@@ -193,4 +194,16 @@ th[role=columnheader]:not (.no-sort ):hover:after {
 
 .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
 	right: 0px;
+}
+
+footer {
+    position: fixed;
+    height: 50px;
+    background-color: #161f27;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-bottom: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
 }

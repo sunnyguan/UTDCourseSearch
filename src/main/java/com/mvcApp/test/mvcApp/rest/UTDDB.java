@@ -403,7 +403,7 @@ public class UTDDB {
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
 				// time shortening
-				String[] timeInfo = time.replaceAll("\r", "\n").split("\n");
+				String[] timeInfo = time.replaceAll("\r", "").split("\n");
 				int i = !timeInfo[0].contains("day") ? 1 : 0;
 				String timeFormatted = "";
 				for(; i < (timeInfo.length) / 3; i++) {

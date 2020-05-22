@@ -404,16 +404,17 @@ public class UTDDB {
 				
 				// time shortening
 				String[] timeInfo = time.replaceAll("\r", "").split("\n");
+				System.out.println("Time: " + time);
 				int i = !timeInfo[0].contains("day") ? 1 : 0;
-				String timeFormatted = "";
-				for(; i < (timeInfo.length) / 3; i++) {
-					String days = timeInfo[0+i*3];
+				String timeFormatted = (i == 1) ? timeInfo[0] + ": " : "";
+				while(i < timeInfo.length) {
+					String days = timeInfo[i++];
 					days = days.replace("Tuesday & Thursday", "TTh");
 					days = days.replace("Monday & Wednesday", "MW");
 					days = days.replace("Monday, Wednesday, Friday", "MWF");
 					days = days.replace("Monday & Wednesday", "MW");
-					String timeRange = timeInfo[1+i*3];
-					String location = timeInfo[2+i*3];
+					String timeRange = timeInfo[i++];
+					String location = timeInfo[i++];
 					timeFormatted += days + " " + timeRange + " " + location + "\n";
 				}
 				output += "<td>" + timeFormatted + "</td>";

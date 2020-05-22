@@ -25,7 +25,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
 
-public class UTDDBUpgrader {
+public class UTDDB {
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 
 	static HashMap<String, String> searches = new HashMap<String, String>();
@@ -93,7 +93,11 @@ public class UTDDBUpgrader {
 		return String.format("%-" + n + "s", s);
 	}
 	
-	public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException { new UTDDBUpgrader().run(); }
+	public void update() throws FailingHttpStatusCodeException, MalformedURLException, IOException { 
+		new UTDDB().run(); 
+	}
+	
+	public UTDDB() {}
 	
 	// flowchart:
 	// 1. Need to update searches and RMP ratings
@@ -209,12 +213,12 @@ public class UTDDBUpgrader {
 				+ "<colgroup>\r\n" + 
 				"       <col span=\"1\" style=\"width: 5%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 8%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 17%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 22%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 12%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 23%;\">\r\n" + 
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th role=\"columnheader\">Course</th>"
@@ -253,7 +257,9 @@ public class UTDDBUpgrader {
 				
 				String prof = tr.getCell(3).asText();
 				// add multiple professor support
-				if(prof.contains(",")) prof = prof.split(",")[0];
+				if(prof.contains(",")) {
+					prof = prof.split(",")[0].trim();
+				}
 				// System.out.println("trimmed from: " + tr.getCell(2).asText() + " to " + prof);
 				
 				String time = tr.getCell(4).asText();
@@ -324,7 +330,7 @@ public class UTDDBUpgrader {
 				
 				String overallRating = "0 (N/A)";
 				double gpaWeight = 70;
-				if(rating.contains("based on") && !avgGPA.contentEquals("N/A")) {
+				if(rating.contains("based on") && !avgGPA.contentEquals("N/A") && !avgGPA.contains("0 Records Found")) {
 					double info0 = 2;
 					try {
 						info0 = Double.parseDouble(avgGPA.split(" ")[0]);
@@ -382,10 +388,21 @@ public class UTDDBUpgrader {
 							add += "normal'";
 						}
 					}catch(Exception e) {}
-					output += "<td" + add + "><a href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
+					output += "<td" + add + "><a class='popup_rmp' href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
 				}
 				
-				output += "<td><a href=\"https://utdgrades.com/results?search=" + prof + "\">" + avgGPA + "</a></td>";
+				// UTDGrades IFrame info: $('.grades').magnificPopup({
+				// https://saitanayd.github.io/utd-grades/?subj=GOVT&num=2305&prof=Travis Hadley
+				String subj = sect.split(" ")[0];
+				String num = sect.split(" ")[1];
+				String pr = prof.contains("Staff") ? "" : prof;
+				String searchString = "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof=" + pr;
+				
+				if(avgGPA.contains("0 Records")) {
+					output += "<td>" + avgGPA + "</td>";
+				} else {
+					output += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
+				}
 				
 				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				

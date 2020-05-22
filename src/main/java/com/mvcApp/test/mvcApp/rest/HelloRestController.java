@@ -34,7 +34,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 @Controller
 public class HelloRestController {
 
-	final boolean FORCENEW = false;
+	final boolean FORCENEW = true;
 	SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 	
 	static HashMap<String, String> searches = new HashMap<String, String>();
@@ -46,7 +46,7 @@ public class HelloRestController {
 	@RequestMapping("/updateDB")
 	@ResponseBody
 	public String scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-	    new UTDDBUpgrader().run();
+	    new UTDDB().run();
 	    readSearches();
 		readProfToRating();
 		return "done! you'll never see this but hey, at least now you know!";
@@ -215,6 +215,8 @@ public class HelloRestController {
 		return String.format("%-" + n + "s", s);
 	}
 	
+	UTDDB udb = new UTDDB();
+	
 	@RequestMapping("rmp")
 	public ModelAndView rmp(@RequestParam String course, @RequestParam String term) {
 		System.out.println(profToRating.size());
@@ -248,12 +250,12 @@ public class HelloRestController {
 				+ "<colgroup>\r\n" + 
 				"       <col span=\"1\" style=\"width: 5%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 8%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 17%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 22%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 7%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 9%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 26%;\">\r\n" + 
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th role=\"columnheader\">Course</th>"

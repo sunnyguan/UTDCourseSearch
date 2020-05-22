@@ -217,13 +217,13 @@ public class UTDDBUpgrader {
 				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
-				+ "<th>Course</th>"
-				+ "<th>Name</th>"
-				+ "<th>Professor</th>"
-				+ "<th>Rating</th>"
-				+ "<th>Avg. GPA</th>"
-				+ "<th>Overall</th>"
-				+ "<th>Schedule</th></tr></thead>";
+				+ "<th role=\"columnheader\">Course</th>"
+				+ "<th role=\"columnheader\">Name</th>"
+				+ "<th role=\"columnheader\">Professor</th>"
+				+ "<th role=\"columnheader\">Rating</th>"
+				+ "<th role=\"columnheader\">Avg. GPA</th>"
+				+ "<th role=\"columnheader\">Overall</th>"
+				+ "<th role=\"columnheader\">Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
 

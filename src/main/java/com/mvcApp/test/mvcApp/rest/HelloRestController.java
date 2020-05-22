@@ -14,9 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -42,10 +44,12 @@ public class HelloRestController {
 	
 	// @Scheduled(cron = "0 1 1 * * ?")
 	@RequestMapping("/updateDB")
-	public void scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+	@ResponseBody
+	public String scheduleTaskWithFixedRate() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 	    new UTDDBUpgrader().run();
 	    readSearches();
 		readProfToRating();
+		return "done! you'll never see this but hey, at least now you know!";
 	}
 	
 	@RequestMapping("/room")
@@ -54,8 +58,9 @@ public class HelloRestController {
 	}
 	
 	@RequestMapping("/memoryCheck")
+	@ResponseBody
 	public String memoryCheck() {
-		return "" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 1.0 / 1024 / 1024;
+		return Math.round((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 1.0 / 1024 / 1024) + " MB used.";
 	}
 	
 	@RequestMapping("/")
@@ -251,13 +256,13 @@ public class HelloRestController {
 				"       <col span=\"1\" style=\"width: 33%;\">\r\n" + 
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
-				+ "<th>Course</th>"
-				+ "<th>Name</th>"
-				+ "<th>Professor</th>"
-				+ "<th>Rating</th>"
-				+ "<th>Avg. GPA</th>"
-				+ "<th>Overall</th>"
-				+ "<th>Schedule</th></tr></thead>";
+				+ "<th role=\"columnheader\">Course</th>"
+				+ "<th role=\"columnheader\">Name</th>"
+				+ "<th role=\"columnheader\">Professor</th>"
+				+ "<th role=\"columnheader\">Rating</th>"
+				+ "<th role=\"columnheader\">Avg. GPA</th>"
+				+ "<th role=\"columnheader\">Overall</th>"
+				+ "<th role=\"columnheader\">Schedule</th></tr></thead>";
 
 		// String term = "term_20f?";
 

@@ -10,21 +10,30 @@
 
   gtag('config', 'UA-167312978-1');
 </script>
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+
+<link rel="stylesheet" href="css/dark.min.css">
 <link href="main.css" rel="stylesheet" type="text/css">
+<link href="css/tablesort.css" rel="stylesheet" type="text/css">
 <script src="js/tablesort.js"></script>
 <script src="js/sorts/tablesort.number.js"></script>
-
+<script src="js/jquery.js"></script>
 <script>
 	function onPageReady() {
 		// Documentation: http://tristen.ca/tablesort/demo/
 		new Tablesort(document.getElementById('professors'));
+		
+		$('#myonoffswitch').on('click', function () {
+		    var $rowsNo = $('#professors tbody tr').filter(function () {
+		        return $.trim($(this).find('td').eq(0).text()) === "Full";
+		        
+		    }).toggle();
+		});
 	}
 
 	// Run the above function when the page is loaded & ready
 	document.addEventListener('DOMContentLoaded', onPageReady, false);
 </script>
+
 </head>
 <body>
 	<form action="rmp">
@@ -35,6 +44,15 @@
 
 	<h2>Search Result for: ${course}</h2>
 	<p>Time taken: ${time} seconds, Number of Professors in Database: ${numProfs}</p>
+    <p>Filter Open Classes Only:
+    <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0" >
+        <label class="onoffswitch-label" for="myonoffswitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+        </label>
+    </div>
+    </p>
 	${output}
 	
 </body>

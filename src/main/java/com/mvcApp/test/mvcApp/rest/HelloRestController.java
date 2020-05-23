@@ -95,11 +95,12 @@ public class HelloRestController {
 		session.setAttribute("history", hist);
 		
 		String searchHistory = "";
-		for(String s : hist) {
+		for(int i = 0; i < hist.size(); i++) {
+			String s = hist.get(i);
 			String c1 = s.split("@@")[0];
 			String c2 = s.split("@@")[1];
 			String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
-			searchHistory += cct + ", ";
+			searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
 		}
 		
 		ModelAndView model = new ModelAndView("/home");

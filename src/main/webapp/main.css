@@ -43,7 +43,7 @@ LABEL.indented-checkbox-text
 }
 
 body {
-	max-width: 90%;
+	max-width: 95%;
 	font-family: 'Alegreya Sans';	
 	margin-bottom:50px;
 }
@@ -212,3 +212,35 @@ footer {
 	float: right;
 	cursor: pointer;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+#column1 {
+  float: left;
+  width: 100%;
+}
+
+#column2 {
+  float: left;
+  width: 0%;
+  height: 94.5%;
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  display: none;
+}
+
+.row {
+	// display: flex;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+

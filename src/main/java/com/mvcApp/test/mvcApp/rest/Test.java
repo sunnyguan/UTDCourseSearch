@@ -10,6 +10,7 @@ public class Test {
 	public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		UTDDB.init();
 		UTDDB.setupClient();
+		
 		String output = UTDDB.newSearch("Ivor Page", "term_20f");
 		System.out.println(output);
 	}

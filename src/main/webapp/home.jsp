@@ -31,6 +31,13 @@
 				// Documentation: http://tristen.ca/tablesort/demo/
 				new Tablesort(document.getElementById('professors'), {descending: true});
 				
+				var popup_mode = false;
+				change_mode(popup_mode);
+				$('#myonoffswitch3').on('click', function () {
+					popup_mode = !popup_mode;
+					change_mode(popup_mode);
+				});
+				
 				$('#myonoffswitch2').on('click', function () {
 					$('td:nth-child(8)').toggle();
 					$('th:nth-child(8)').toggle();
@@ -53,29 +60,49 @@
 				        else $(this).css({"background-color": "#202b38"});
 				    });
 				});
+			}
+			
+			function change_mode(popup){
 				
-				$('.popup_grade').each(function() {
-					$(this).magnificPopup({
-						  type: 'iframe',
-						  iframe: {
-						     markup: '<div class="mfp-iframe-scaler">'+
-						                '<div class="mfp-close"></div>'+
-						                '<iframe style="height: 600px;" src=' + $(this).attr("href") + '></iframe>'
-						  }
-					});
+				$('.popup_grade, .popup_rmp, .popup_details').each(function() {
+					var hrf = $(this).attr("href").replace(/\s/g,"%20");
+					if(popup) {
+						$('#column2').hide();
+						$('#column2>iframe').attr('src', "");
+						$('#column1').css({'width': '100%'});
+						$('#column2').css({'width': '0%'});
+						$(this).unbind('click');
+						$(this).magnificPopup({
+							  type: 'iframe',
+							  iframe: {
+							     markup: '<div class="mfp-iframe-scaler">'+
+							                '<div class="mfp-close"></div>'+
+							                '<iframe style="height: 600px;" src=' + hrf + '></iframe>'
+							  }
+						});
+					} else {
+						$(this).unbind('click');
+						$(this).click(function (event) {
+							event.preventDefault();
+							$.magnificPopup.close();
+							if($('#column2').is(':visible')){
+								if($('#column2>iframe').attr('src') === hrf) {
+									$('#column2').slideUp();
+									$('#column2>iframe').attr('src', "");
+									$('#column1').css({'width': '100%'});
+									$('#column2').css({'width': '0%'});
+								} else {
+									$('#column2').html('<iframe style="height: 100%; width:100%" src=' + hrf + '></iframe>');
+								}
+							} else {
+								$('#column2').html('<iframe style="height: 100%; width:100%" src=' + hrf + '></iframe>');
+								$('#column2').show();
+								$('#column1').css({'width': '60%'});
+								$('#column2').css({'width': '40%'});
+							}
+						});
+					}
 				});
-				
-				$('.popup_rmp').each(function() {
-					$(this).magnificPopup({
-						  type: 'iframe',
-						  iframe: {
-						     markup: '<div class="mfp-iframe-scaler">'+
-						                '<div class="mfp-close"></div>'+
-						                '<iframe style="height: 600px;" src=' + $(this).attr("href") + '></iframe>'
-						  }
-					});
-				});
-				
 			}
 			
 			document.addEventListener('DOMContentLoaded', onPageReady, false);
@@ -93,6 +120,8 @@
 		</script>
 	</head>
 	<body>
+		<div class="row">
+		<div id="column1">
 		<form action="rmp">
 			<select style="display:inline" class="term-popup" id="srch_term" name="term">
 				<option value="term_all">Search All Terms</option>
@@ -164,8 +193,22 @@
 				class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>
 			</label>
 		</div>
+		<br>
+		<div style="display: inline-block; margin-right: 15px; margin-bottom:20px;">Toggle Sidebar vs. Popup:</div>
+		<div class="onoffswitch" style="height: 28px; display: inline-block; vertical-align: middle;">
+			<input type="checkbox" name="onoffswitch3" class="onoffswitch-checkbox"
+				id="myonoffswitch3" tabindex="0"> <label
+				class="onoffswitch-label" for="myonoffswitch3"> <span
+				class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>
+			</label>
+		</div>
 		${output}
 		<p>© Made by <a href="https://www.linkedin.com/in/sunny-guan/">Sunny Guan</a>, credit for UTDGrades visualization goes to <a href="https://www.linkedin.com/in/saitanayd/">Sai Desaraju</a>. Tools used: <a href="https://dimsemenov.com/plugins/magnific-popup/">magnific-popup</a>, <a href="https://kognise.github.io/water.css/">water.css</a>, <a href="http://tristen.ca/tablesort/demo/">tablesort</a>.</p>
+	</div>
+	<div id="column2">
+		
+	</div>
+	</div>
 	<footer>
 		<p><a id="clearHistory" onclick="loadDoc()">Clear</a>Search History: <span id="search_history"> ${history}</span></p>
 	</footer>

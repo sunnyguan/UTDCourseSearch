@@ -379,7 +379,7 @@ public class UTDDB {
 				output += "<tr>";
 				output += "<td>" + open + "</td>";
 				output += "<td>" + sect + "</td>";
-				output += "<td><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
+				output += "<td><a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
 				if (name.contains("CV Honors")) output += "<b>" + formatName + "</b></a></td>";
 				else output += formatName + "</a></td>";
 				output += "<td>" + prof + "</td>";
@@ -430,6 +430,10 @@ public class UTDDB {
 			e.printStackTrace();
 		}
 		return output;
+	}
+	
+	public void findBest(ArrayList<String> courses) {
+		
 	}
 	
 }

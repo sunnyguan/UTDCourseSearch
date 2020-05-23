@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -152,7 +153,7 @@ public class UTDDB {
 	}
 	
 	static void setupClient() {
-		client = new WebClient();
+		client = new WebClient(BrowserVersion.BEST_SUPPORTED);
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
 		client.getOptions().setThrowExceptionOnFailingStatusCode(false);

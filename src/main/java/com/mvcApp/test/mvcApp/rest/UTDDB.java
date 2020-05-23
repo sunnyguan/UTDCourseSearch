@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -89,8 +91,9 @@ public class UTDDB {
 	}
 	
 	static void saveSearch() {
-		boolean status = saveFile("searches.ser", searches);
-		System.out.println("Writing searches success: " + status);
+		// no longer storing searches as of 5/23/2020
+		// boolean status = saveFile("searches.ser", searches);
+		// System.out.println("Writing searches success: " + status);
 	}
 	
 	static int getProfs() {
@@ -126,17 +129,19 @@ public class UTDDB {
 		System.out.println("INFO: Ratings updated.");
 		
 		// update searches
-		HashMap<String, String> newSearches = new HashMap<String, String>();
+		// obsolete as of may 23
+		/*HashMap<String, String> newSearches = new HashMap<String, String>();
 		i = 0;
 		for(Map.Entry<String, String> s : searches.entrySet()) {
 			String search = s.getKey();
 			System.out.println("Updating search " + padRight(i++ + "", 5) + "/" + searches.size() + ": " + search);
-			String newOutput = newSearch(search.split("%%")[0], search.split("%%")[1]);
+			String newOutput = newSearch(search.split("%%")[0], search.split("%%")[1], null);
 			newSearches.put(search, newOutput);
 		}
 		searches = newSearches;
 		saveSearch(); // saves searches
 		System.out.println("INFO: Searches and ratings updated. Upgrade complete.");
+		*/
 	}
 	
 	public static void init() {
@@ -225,14 +230,22 @@ public class UTDDB {
 	 * Returns the rate my professor results in the form of "x based on y ratings@@RMP_ID"
 	 * RMP_ID is used to link IFrame 
 	 */
-	public static String rmp(String course, String term) {
+	public static String rmp(String course, String term, SseEmitter se) {
 		System.out.println(profToRating.size());
 		String output = "";
 		String identifier = course + "%%" + term;
 		if(!searches.containsKey(identifier) || HelloRestController.FORCENEW) {
-			output = newSearch(course, term);
-			searches.put(identifier, output);
-			saveSearch();
+			output = newSearch(course, term, se);
+			if(!output.equals("remove me")) {
+				searches.put(identifier, output);
+				saveSearch();
+			} else {
+				try {
+					se.complete();
+				} catch (Exception e) {
+					System.out.println("oof im already gone");
+				}
+			}
 		} else {
 			output = searches.get(identifier);
 		}
@@ -295,7 +308,7 @@ public class UTDDB {
 	/**
 	 * returns the table html for a search
 	 */
-	public static String newSearch(String course, String term) {
+	public static String newSearch(String course, String term, SseEmitter se) {
 		System.out.println(dateFormatLocal.format(new Date()) + "\tRequested Course: " + course);
 		
 		String output = "<table style=\"width: 100%;\" id=\"professors\">"
@@ -307,8 +320,8 @@ public class UTDDB {
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 6%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 23%;\">\r\n" +
-				"       <col span=\"1\" style=\"width: 6%;\">\r\n" +
+				"       <col span=\"1\" style=\"width: 20%;\">\r\n" +
+				"       <col span=\"1\" style=\"width: 9%;\">\r\n" +
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th role=\"columnheader\">Course</th>"
@@ -318,9 +331,9 @@ public class UTDDB {
 				+ "<th role=\"columnheader\">Avg. GPA</th>"
 				+ "<th role=\"columnheader\" data-sort-default><div class=\"tooltip\">Overall<span class=\"tooltiptext\">30% RMP + 70% GPA</span></div></th>"
 				+ "<th role=\"columnheader\">Schedule</th>"
-				+ "<th role=\"columnheader\">Add Class</th>"
+				+ "<th role=\"columnheader\">Add Class (Not Galaxy)</th>"
 				+ "</tr></thead>";
-
+		String line = "";
 		String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
 		long timeTrack = System.currentTimeMillis();
 		if(client == null) init();
@@ -334,6 +347,7 @@ public class UTDDB {
 			List l = page.getByXPath("//*/td[4]");
 			
 			for (int section = 1; section <= l.size(); section++) {
+				// Thread.sleep(1000);
 				timeTrack = System.currentTimeMillis();
 				
 				HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
@@ -379,21 +393,21 @@ public class UTDDB {
 				} catch (Exception e) {}
 
 				
-				output += "<tr>";
-				output += "<td>" + open + "</td>";
-				output += "<td>" + sect + "</td>";
-				output += "<td><a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
-				if (name.contains("CV Honors")) output += "<b>" + formatName + "</b></a></td>";
-				else output += formatName + "</a></td>";
-				output += "<td>" + prof + "</td>";
+				// line += "<tr>";
+				line += "<td>" + open + "</td>";
+				line += "<td>" + sect + "</td>";
+				line += "<td><a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url + "\">";
+				if (name.contains("CV Honors")) line += "<b>" + formatName + "</b></a></td>";
+				else line += formatName + "</a></td>";
+				line += "<td>" + prof + "</td>";
 				
 				if(rating.equals(no_rmp_data)) {
-					output += "<td>" + rating + "</td>";
+					line += "<td>" + rating + "</td>";
 				} else {
 					String gtid = "";
 					gtid = rating.split("@@")[1];
 					rating = rating.split("@@")[0];
-					output += "<td><a class='popup_rmp' href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
+					line += "<td><a class='popup_rmp' href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + gtid + "\">" + rating + "</a></td>";
 				}
 				
 				String subj = sect.split(" ")[0];
@@ -401,9 +415,9 @@ public class UTDDB {
 				String pr = prof.contains("Staff") ? "" : prof;
 				String searchString = "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof=" + pr;
 				
-				if(avgGPA.equals(no_gpa_data)) output += "<td>" + avgGPA + "</td>";
-				else  output += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
-				output += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
+				if(avgGPA.equals(no_gpa_data)) line += "<td>" + avgGPA + "</td>";
+				else line += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
+				line += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
 				// time shortening
 				String[] timeInfo = time.replaceAll("\r", "").split("\n");
@@ -423,15 +437,35 @@ public class UTDDB {
 					String location = timeInfo[i++];
 					timeFormatted += days + " " + timeRange + " " + location + "\n";
 				}
-				output += "<td>" + timeFormatted + "</td>";
-				output += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "'onclick='addCourse(this)'>Add</a></td>";
 				
-				output += "</tr>";
+				line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "'onclick='addCourse(this)'>Add</a></td>";
+				line += "<td>" + timeFormatted + "</td>";
+				
+				// line += "</tr>";
+				output += line;
+				if(se != null) {
+					try {
+						se.send(SseEmitter.event().data(line));
+					} catch (Exception e) {
+						System.out.println("bye bye 1");
+						return "remove me";
+					}
+				}
+				line = "";
 				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
 			}
 			output += "</table>";
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		if(se != null) {
+			try {
+				se.send(SseEmitter.event().data("done"));
+			} catch (Exception e) {
+				System.out.println("bye bye 2");
+				return "remove me";
+			}
 		}
 		return output;
 	}

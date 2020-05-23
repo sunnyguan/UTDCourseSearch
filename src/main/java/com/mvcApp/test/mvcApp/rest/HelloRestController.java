@@ -86,8 +86,8 @@ public class HelloRestController {
 	public ModelAndView rmp(@RequestParam String course, @RequestParam String term, HttpSession session) {
 		long t = System.currentTimeMillis();
 		
-		if(term.toUpperCase().startsWith("CS ")) {
-			term = term.replace("CS ", "CS"); // quick fix for CS search issue
+		if(term.toLowerCase().startsWith("cs ")) {
+			term = term.toLowerCase().replace("cs ", "cs"); // quick fix for CS search issue
 		}
 		
 		String output = UTDDB.rmp(course, term);

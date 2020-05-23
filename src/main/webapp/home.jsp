@@ -117,6 +117,32 @@
 			  xhttp.open("GET", "clear_history", true);
 			  xhttp.send();
 			}
+			function addCourse(element) {
+				$.ajax({
+				    type: "GET",
+				    url: 'add_course',
+				    data: {"course":$(element).attr('value')},
+				    success: function(data){
+				    	$('.dropdown-content').html(data);
+				    	$(element).attr('href', '#');
+				    	$(element).text('Added');
+				    	$(element).css('text-decoration', 'none');
+				    	// $(element).css('color', '#00f');
+				        // alert(data);
+				    }
+				 });
+			}
+			function removeCourse(element) {
+				$.ajax({
+				    type: "GET",
+				    url: 'remove_course',
+				    data: {"course":$(element).text()},
+				    success: function(data){
+				    	$('.dropdown-content').html(data);
+				        // alert(data);
+				    }
+				 });
+			}
 		</script>
 	</head>
 	<body>
@@ -171,7 +197,13 @@
 				<option value="term_10s">2010 Spring (10s)</option>
 			</select>
 			<input style="display:inline" type="text" name="course" placeholder="Course Name">
-			<input style="display:inline"type="submit">
+			<input style="display:inline" type="submit">
+			<div class="dropdown">
+			  <button type='button' class="dropbtn">Current Classes</button>
+			  <div class="dropdown-content">
+			    ${classes}
+			  </div>
+			</div>
 		</form>
 		<h2>Search Result for: ${course}</h2>
 		<p>Time taken: ${time} seconds, Number of Professors in Database: ${numProfs}</p>

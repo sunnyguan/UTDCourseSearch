@@ -306,8 +306,9 @@ public class UTDDB {
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
 				"       <col span=\"1\" style=\"width: 10%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 9%;\">\r\n" + 
-				"       <col span=\"1\" style=\"width: 26%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 6%;\">\r\n" + 
+				"       <col span=\"1\" style=\"width: 23%;\">\r\n" +
+				"       <col span=\"1\" style=\"width: 6%;\">\r\n" +
 				"  </colgroup>"
 				+ "<thead><tr data-sort-method=\"none\"><th>Status</th>"
 				+ "<th role=\"columnheader\">Course</th>"
@@ -316,7 +317,9 @@ public class UTDDB {
 				+ "<th role=\"columnheader\">Rating</th>"
 				+ "<th role=\"columnheader\">Avg. GPA</th>"
 				+ "<th role=\"columnheader\" data-sort-default><div class=\"tooltip\">Overall<span class=\"tooltiptext\">30% RMP + 70% GPA</span></div></th>"
-				+ "<th role=\"columnheader\">Schedule</th></tr></thead>";
+				+ "<th role=\"columnheader\">Schedule</th>"
+				+ "<th role=\"columnheader\">Add Class</th>"
+				+ "</tr></thead>";
 
 		String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
 		long timeTrack = System.currentTimeMillis();
@@ -421,8 +424,9 @@ public class UTDDB {
 					timeFormatted += days + " " + timeRange + " " + location + "\n";
 				}
 				output += "<td>" + timeFormatted + "</td>";
-				output += "</tr>";
+				output += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "'onclick='addCourse(this)'>Add</a></td>";
 				
+				output += "</tr>";
 				System.out.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
 			}
 			output += "</table>";

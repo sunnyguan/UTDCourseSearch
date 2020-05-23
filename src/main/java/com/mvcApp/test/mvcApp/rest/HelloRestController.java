@@ -108,9 +108,17 @@ public class HelloRestController {
 			searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
 		}
 		
+		ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
+		if(classes == null) {
+			classes = new ArrayList<String>();
+		}
+		session.setAttribute("classes", classes);
+		String classesList = returnClasses(classes);
+		
 		ModelAndView model = new ModelAndView("/home");
 		model.addObject("output", output);
 		model.addObject("course", course);
+		model.addObject("classes", classesList);
 		model.addObject("time", time / 1000.0);
 		model.addObject("history", searchHistory);
 		model.addObject("numProfs", UTDDB.getProfs());
@@ -124,6 +132,34 @@ public class HelloRestController {
 		if(hist != null && hist.size() != 0) hist = new ArrayList<String>();
 		session.setAttribute("history", hist);
 		return "";
+	}
+	
+	@RequestMapping("/add_course")
+	@ResponseBody
+	public String add_course(@RequestParam String course, HttpSession session) {
+		ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
+		if(classes == null) classes = new ArrayList<String>();
+		classes.add(course);
+		session.setAttribute("classes", classes);
+		return returnClasses(classes);
+	}
+	
+	@RequestMapping("/remove_course")
+	@ResponseBody
+	public String remove_course(@RequestParam String course, HttpSession session) {
+		ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
+		if(classes == null) classes = new ArrayList<String>();
+		if(classes.contains(course)) classes.remove(course);
+		session.setAttribute("classes", classes);
+		return returnClasses(classes);
+	}
+	
+	public String returnClasses(ArrayList<String> classes) {
+		String classesList = "";
+		for(int i = 0; i < classes.size(); i++) {
+			classesList += "<a class='drop' onclick='removeCourse(this)'>" + classes.get(i) + "</a>"; // add remove button
+		}
+		return classesList;
 	}
 	
 }

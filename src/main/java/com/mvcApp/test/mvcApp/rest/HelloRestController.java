@@ -85,6 +85,11 @@ public class HelloRestController {
 	@RequestMapping("rmp")
 	public ModelAndView rmp(@RequestParam String course, @RequestParam String term, HttpSession session) {
 		long t = System.currentTimeMillis();
+		
+		if(term.toUpperCase().startsWith("CS ")) {
+			term = term.replace("CS ", "CS"); // quick fix for CS search issue
+		}
+		
 		String output = UTDDB.rmp(course, term);
 		double time = (System.currentTimeMillis() - t);
 		System.out.println("Completed Request in " + time/1000.0 + " seconds.");

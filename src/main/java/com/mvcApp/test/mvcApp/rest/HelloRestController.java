@@ -120,11 +120,18 @@ public class HelloRestController {
 	// s.put("CS 1200", new String[] { "2020-04-27T10:30:00", "2020-04-27T12:30:00"
 	// });
 	String output = "<script>var calendarEl = document.getElementById('calendar');"
-		+ "var calendar = new FullCalendar.Calendar(calendarEl, {\r\n"
-		+ "    	    plugins: [ 'timeGrid' ],\r\n" + "    	    defaultView: 'timeGridWeek',\r\n"
-		+ "    	    defaultDate: '2020-04-20',\r\n" + "    	    header: {\r\n"
-		+ "    	      left: 'prev,next',\r\n" + "    	      center: 'title',\r\n"
-		+ "    	      right: 'timeGridWeek'\r\n" + "    	    },\r\n" + "    	    events: [\r\n";
+		+ "var calendar = new FullCalendar.Calendar(calendarEl, {"
+		+ "    	    plugins: [ 'timeGrid' ]," + "defaultView: 'timeGridWeek',"
+		+ "    	    defaultDate: '2020-04-20'," + "customButtons: {" + 
+			"    refresh: {" + 
+			"      text: 'refresh'," + 
+			"      click: function() {" + 
+			"        window.location.reload(true);" + 
+			"      }" + 
+			"    }" + 
+			"  }," + "header: {"
+		+ "    	      left: 'prev,next,refresh'," + "center: 'title',"
+		+ "    	      right: 'timeGridWeek'" + "},\r\n" + "events: [";
 
 	for (Map.Entry<String, ArrayList<String[]>> me : s.entrySet()) {
 	    for (String[] day : me.getValue()) {

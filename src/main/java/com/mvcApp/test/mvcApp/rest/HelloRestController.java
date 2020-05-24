@@ -90,15 +90,15 @@ public class HelloRestController {
 		ArrayList<String> dates = new ArrayList<String>();
 		if(days.contains("Monday"))
 			dates.add("2020-04-20");
-		else if(days.contains("Tuesday"))
+		if(days.contains("Tuesday"))
 			dates.add("2020-04-21");
-		else if(days.contains("Wednesday"))
+		if(days.contains("Wednesday"))
 			dates.add("2020-04-22");
-		else if(days.contains("Thursday"))
+		if(days.contains("Thursday"))
 			dates.add("2020-04-23");
-		else if(days.contains("Friday"))
+		if(days.contains("Friday"))
 			dates.add("2020-04-24");
-		else if(days.contains("Saturday"))
+		if(days.contains("Saturday"))
 			dates.add("2020-04-25");
 		return dates;
 	}
@@ -106,7 +106,7 @@ public class HelloRestController {
 	@RequestMapping("/calendar")
 	public void calendar(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		/// ModelAndView mav = new ModelAndView("calendar.jsp");
-		HashMap<String, String[]> s = new HashMap<String, String[]>();
+		HashMap<String, ArrayList<String[]>> s = new HashMap<String, ArrayList<String[]>>();
 		if(session.getAttribute("classes") != null) {
 			ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
 			for(String cls : classes) {
@@ -132,7 +132,9 @@ public class HelloRestController {
 					ArrayList<String> ds = daysToArray(days);
 					for(String s1 : ds) {
 						String[] times = new String[] {s1 + "T" + begEnd[0], s1 + "T" + begEnd[1]};
-						s.put(label, times);
+						if(!s.containsKey(label)) 
+							s.put(label, new ArrayList<String[]>());
+						s.get(label).add(times);
 					}
 				}
 			}
@@ -153,12 +155,14 @@ public class HelloRestController {
 				"    	    },\r\n" + 
 				"    	    events: [\r\n";
 				
-		for (Map.Entry<String, String[]> me : s.entrySet()) {
-			output += "{";
-			output += "title: '" + me.getKey() + "',";
-			output += "start: '" + me.getValue()[0] + "',";
-			output += "end: '" + me.getValue()[1] + "',";
-			output += "},";
+		for (Map.Entry<String, ArrayList<String[]>> me : s.entrySet()) {
+			for(String[] day : me.getValue()) {
+				output += "{";
+				output += "title: '" + me.getKey() + "',";
+				output += "start: '" + day[0] + "',";
+				output += "end: '" + day[1] + "',";
+				output += "},";
+			}
 		}
 		
 		output += "    	    ]\r\n" + 

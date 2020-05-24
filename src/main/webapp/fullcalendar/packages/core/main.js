@@ -6398,7 +6398,9 @@ Docs & License: https://fullcalendar.io/
             var days = diffWholeDays(dateProfile.currentRange.start, dateProfile.currentRange.end);
             if (days !== null && days > 1) {
                 // multi-day range. shorter, like "Sep 9 - 10 2014"
-                return { year: 'numeric', month: 'short', day: 'numeric' };
+                // return { year: 'numeric', month: 'short', day: 'numeric' };  //Yinghua
+            	// year only, like "2020"
+                return { year: 'numeric'};  //Yinghua
             }
             else {
                 // one day. longer, like "September 9 2014"
@@ -8196,7 +8198,8 @@ Docs & License: https://fullcalendar.io/
             return { weekday: 'short' }; // "Sat"
         }
         else if (dayCnt > 1) {
-            return { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true }; // "Sat 11/12"
+            // return { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true }; // "Sat 11/12" (Yinghua)
+            return { weekday: 'long' }; // "Saturday" (Yinghua)
         }
         else {
             return { weekday: 'long' }; // "Saturday"

@@ -421,7 +421,8 @@ public class UTDDB {
 				line += "<td>" + overallRating + "</td>"; //  data-sort-method='number'
 				
 				// time shortening
-				String[] timeInfo = time.replaceAll("\r", "").split("\n");
+				time = time.replaceAll("\r", "");
+				String[] timeInfo = time.split("\n");
 				// System.out.println("Time: " + time);
 				int i = !timeInfo[0].contains("day") ? 1 : 0;
 				String timeFormatted = "";
@@ -430,16 +431,18 @@ public class UTDDB {
 				}
 				while(i < timeInfo.length) {
 					String days = timeInfo[i++];
+					String timeRange = timeInfo[i++];
+					String location = timeInfo[i++];
+					
 					days = days.replace("Tuesday & Thursday", "TTh");
 					days = days.replace("Monday & Wednesday", "MW");
 					days = days.replace("Monday, Wednesday, Friday", "MWF");
 					days = days.replace("Monday & Wednesday", "MW");
-					String timeRange = timeInfo[i++];
-					String location = timeInfo[i++];
+					
 					timeFormatted += days + " " + timeRange + " " + location + "\n";
 				}
 				
-				line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "'onclick='addCourse(this)'>Add</a></td>";
+				line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "!!" + time.replaceAll("\n", "@@") + "' onclick='addCourse(this)'>Add</a></td>";
 				line += "<td>" + timeFormatted + "</td>";
 				
 				// line += "</tr>";

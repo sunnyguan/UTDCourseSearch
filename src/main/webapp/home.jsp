@@ -32,16 +32,32 @@
 			var diff = 0;
 			var sort;
 			var popup_mode = false;
+			var modal;
 			function onPageReady() {
+				
+				modal = document.getElementById("myModal");
+				var btn = document.getElementById("myBtn");
+				var span = document.getElementsByClassName("close")[0];
+				btn.onclick = function() {
+				  modal.style.display = "block";
+				}
+				span.onclick = function() {
+				  modal.style.display = "none";
+				}
+				window.onclick = function(event) {
+				  if (event.target == modal) {
+				    modal.style.display = "none";
+				  }
+				}
 				
 				sort = new Tablesort(document.getElementById('professors'), {
 					descending : true
 				});
 				startTime = Date.now();
-				timer = setInterval(function() {
+				/*timer = setInterval(function() {
 					diff = Math.round((Date.now() - startTime) * 10) / 10000;
 					$('#time').text(diff);
-				}, 100);
+				}, 100);*/
 				
 				$('#myonoffswitch3').on('click', function() {
 					popup_mode = !popup_mode;
@@ -217,11 +233,29 @@
 					type : "GET",
 					url : 'remove_course',
 					data : {
-						"course" : $(element).text()
+						"course" : $(element).attr('value')
 					},
 					success : function(data) {
 						$('.dropdown-content').html(data);
 						// alert(data);
+					}
+				});
+			}
+			
+			function feedback(element) {
+				$.ajax({
+					type : "GET",
+					url : 'feedback',
+					data : {
+						"info" : $("#feed").val()
+					},
+					success : function(data) {
+						$('#feedback_info').text(data);
+						$("#feed").val('');
+						setTimeout(function(){ 
+							modal.style.display = 'none'; 
+							$('#feedback_info').text('');
+						}, 1000);
 					}
 				});
 			}
@@ -232,6 +266,8 @@
 			var ind = 0;
 			sse.onmessage = function(evt) {
 				var data = evt.data;
+				diff = Math.round((Date.now() - startTime) * 10) / 10000;
+				$('#time').text(diff);
 				if (data !== "done") {
 					$('#loading>h2').text("Retrieving Results #" + ind++);
 					var el = document.getElementById('bod');
@@ -240,13 +276,11 @@
 					el.appendChild(z);
 					// if(ind % 20 == 0) sort.refresh();
 				} else {
-					diff = Math.round((Date.now() - startTime) * 10) / 10000;
 					$('#loading>h2').text("Found " + ind + " results in " + diff + " seconds.");
 					// setTimeout(function(){ $('#loading').hide(); }, 2000);
 					// Documentation: http://tristen.ca/tablesort/demo/
 					clearInterval(timer);
 					sort.refresh();
-					$('#time').text(diff);
 					change_mode(popup_mode);
 				}
 				// var diff = Math.round((Date.now() - startTime) * 1000) / 1000000;
@@ -309,7 +343,7 @@
 			<input style="display:inline" type="text" name="course" placeholder="Course Name">
 			<input style="display:inline" type="submit">
 			<div class="dropdown">
-			  <button type='button' class="dropbtn" onclick="alert('Work in Progress!');">Current Classes</button>
+			  <button type='button' class="dropbtn" onclick="location.href='/calendar'">Current Classes</button>
 			  <div class="dropdown-content">
 			    ${classes}
 			  </div>
@@ -374,7 +408,16 @@
 			</tbody>
 		</table>
 		
-		<p>© Made by <a href="https://www.linkedin.com/in/sunny-guan/">Sunny Guan</a>, credit for UTDGrades visualization goes to <a href="https://www.linkedin.com/in/saitanayd/">Sai Desaraju</a>. Tools used: <a href="https://dimsemenov.com/plugins/magnific-popup/">magnific-popup</a>, <a href="https://kognise.github.io/water.css/">water.css</a>, <a href="http://tristen.ca/tablesort/demo/">tablesort</a>.</p>
+		<p>© Made by <a href="https://www.linkedin.com/in/sunny-guan/">Sunny Guan</a>, credit for UTDGrades visualization goes to <a href="https://www.linkedin.com/in/saitanayd/">Sai Desaraju</a>. Tools used: <a href="https://dimsemenov.com/plugins/magnific-popup/">magnific-popup</a>, <a href="https://kognise.github.io/water.css/">water.css</a>, <a href="http://tristen.ca/tablesort/demo/">tablesort</a>. <a id="myBtn">Feedback?</a></p>
+		<div id="myModal" class="modal">
+		  <div class="modal-content">
+		  	<span>Feedback?</span>
+		    <span class="close">&times;</span>
+		    <textarea id="feed"></textarea>
+		    <button onclick="feedback(this);">Submit</button>
+		    <span id="feedback_info"></span>
+		  </div>
+		</div>
 	</div>
 	<div id="column2">
 		

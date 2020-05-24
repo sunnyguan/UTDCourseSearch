@@ -1,5 +1,6 @@
 package com.mvcApp.test.mvcApp.rest;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
@@ -7,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,6 +21,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 @EnableScheduling
@@ -77,6 +82,98 @@ public class HelloRestController {
 	@RequestMapping("/home")
 	public String home() {
 		return "home.jsp";
+	}
+	
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	public static ArrayList<String> daysToArray(String days) {
+		ArrayList<String> dates = new ArrayList<String>();
+		if(days.contains("Monday"))
+			dates.add("2020-04-20");
+		else if(days.contains("Tuesday"))
+			dates.add("2020-04-21");
+		else if(days.contains("Wednesday"))
+			dates.add("2020-04-22");
+		else if(days.contains("Thursday"))
+			dates.add("2020-04-23");
+		else if(days.contains("Friday"))
+			dates.add("2020-04-24");
+		else if(days.contains("Saturday"))
+			dates.add("2020-04-25");
+		return dates;
+	}
+	
+	@RequestMapping("/calendar")
+	public void calendar(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		/// ModelAndView mav = new ModelAndView("calendar.jsp");
+		HashMap<String, String[]> s = new HashMap<String, String[]>();
+		if(session.getAttribute("classes") != null) {
+			ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
+			for(String cls : classes) {
+				String label = cls.split(" -- ")[0]; // change to !! to get full label
+				String[] info = cls.split("!!")[1].split("@@");
+				if(info.length == 3 || info.length == 4) {
+					int pre = info.length - 3;
+					String days = info[0 + pre];
+					String timeRange = info[1 + pre];
+					String room = info[2 + pre];
+					
+					String[] begEnd = timeRange.split(" - ");
+					begEnd[0] = (begEnd[0].length() == 6) ? "0" + begEnd[0] : begEnd[0];
+					begEnd[1] = (begEnd[1].length() == 6) ? "0" + begEnd[1] : begEnd[1];
+					if(begEnd[0].contains("pm")) 
+						begEnd[0] = Integer.parseInt(begEnd[0].substring(0, 2)) + 12 + begEnd[0].substring(2, 5);
+					else begEnd[0] = begEnd[0].substring(0, 5);
+					if(begEnd[1].contains("pm")) 
+						begEnd[1] = Integer.parseInt(begEnd[1].substring(0, 2)) + 12 + begEnd[1].substring(2, 5);
+					else begEnd[1] = begEnd[1].substring(0, 5);
+					
+					timeRange = timeRange.replaceAll("am", "");
+					ArrayList<String> ds = daysToArray(days);
+					for(String s1 : ds) {
+						String[] times = new String[] {s1 + "T" + begEnd[0], s1 + "T" + begEnd[1]};
+						s.put(label, times);
+					}
+				}
+			}
+			
+		}
+		
+		// s.put("CS 3345", new String[] { "2020-04-27T08:30:00", "2020-04-27T09:30:00" });
+		// s.put("CS 1200", new String[] { "2020-04-27T10:30:00", "2020-04-27T12:30:00" });
+		String output = "<script>var calendarEl = document.getElementById('calendar');"
+				+ "var calendar = new FullCalendar.Calendar(calendarEl, {\r\n" + 
+				"    	    plugins: [ 'timeGrid' ],\r\n" + 
+				"    	    defaultView: 'timeGridWeek',\r\n" + 
+				"    	    defaultDate: '2020-04-20',\r\n" + 
+				"    	    header: {\r\n" + 
+				"    	      left: 'prev,next',\r\n" + 
+				"    	      center: 'title',\r\n" + 
+				"    	      right: 'timeGridWeek'\r\n" + 
+				"    	    },\r\n" + 
+				"    	    events: [\r\n";
+				
+		for (Map.Entry<String, String[]> me : s.entrySet()) {
+			output += "{";
+			output += "title: '" + me.getKey() + "',";
+			output += "start: '" + me.getValue()[0] + "',";
+			output += "end: '" + me.getValue()[1] + "',";
+			output += "},";
+		}
+		
+		output += "    	    ]\r\n" + 
+				"    	  });calendar.render();";
+		System.out.println(output);
+
+		try {
+			request.setAttribute("events", OBJECT_MAPPER.writeValueAsString(output));
+			request.getRequestDispatcher("calendar.jsp").forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// mav.addObject("events", output);
+		// return mav;
 	}
 
 	@RequestMapping("/cc")
@@ -169,10 +266,25 @@ public class HelloRestController {
 		return returnClasses(classes);
 	}
 
+	@RequestMapping("/feedback")
+	@ResponseBody
+	public String feedback(@RequestParam String info) {
+		try {
+			String filename = "feedback.txt";
+			FileWriter fw = new FileWriter(filename, true);
+			fw.write(info + "\n");
+			fw.close();
+		} catch (IOException e) {
+			System.out.println("Write error");
+		}
+		return "Saved!";
+	}
+
 	public String returnClasses(ArrayList<String> classes) {
 		String classesList = "";
 		for (int i = 0; i < classes.size(); i++) {
-			classesList += "<a class='drop' onclick='removeCourse(this)'>" + classes.get(i) + "</a>"; // add remove
+			String ret = classes.get(i).split("!!")[0];
+			classesList += "<a class='drop' onclick='removeCourse(this)' value='" + classes.get(i) + "'>" + ret + "</a>"; // add remove
 																										// button
 		}
 		return classesList;
@@ -183,7 +295,7 @@ public class HelloRestController {
 	private synchronized SseEmitter newEmitterForUser(String username) {
 
 		SseEmitter emitter = new SseEmitter();
-		
+
 		// if(sseEmitters.containsKey(username)) sseEmitters.get(username).complete();
 
 		Runnable remover = new Runnable() {
@@ -224,13 +336,13 @@ public class HelloRestController {
 	@ResponseBody
 	public String testMsg(@RequestParam String course, @RequestParam String term, HttpSession session) {
 		String id = session.getId();
-		if(sseEmitters.containsKey(id)) {
+		if (sseEmitters.containsKey(id)) {
 			UTDDB.rmp(course, term, sseEmitters.get(id));
 			// notifyUser(id, course);
 		}
 		return "test";
 	}
-	
+
 	@RequestMapping("/feed")
 	public ResponseBodyEmitter feed(HttpSession session) {
 		System.out.println("Feed Reporting");
@@ -238,35 +350,36 @@ public class HelloRestController {
 		System.out.println(session.getId() + " null?: " + (emitter == null));
 		return emitter;
 	}
-	
+
 	@RequestMapping("rmp")
 	public ModelAndView stream(@RequestParam String course, @RequestParam String term, HttpSession session) {
 		System.out.println("RMP2 reporting");
 		long t = System.currentTimeMillis();
-		
+
 		String id = session.getId();
-		if(sseEmitters.containsKey(id)) {
+		if (sseEmitters.containsKey(id)) {
 			sseEmitters.get(id).complete();
 		}
 		newEmitterForUser(id);
 		System.out.println(session.getId() + " null?: " + (sseEmitters.get(id) == null));
-		
+
 		// run test from streaming
 		if (course.toLowerCase().startsWith("cs ")) {
 			course = course.toLowerCase().replace("cs ", "cs"); // quick fix for CS search issue
 		}
 		final String cc = course;
 		Thread one = new Thread() {
-		    public void run() {
-		    	String id = session.getId();
+			public void run() {
+				String id = session.getId();
 				UTDDB.rmp(cc, term, sseEmitters.get(id));
-		    }
+			}
 		};
 		one.start();
-		
+
 		// String output = UTDDB.rmp(course, term, null);
 		// double time = (System.currentTimeMillis() - t);
-		// System.out.println("Completed (fake) Request in " + time / 1000.0 + " seconds.");
+		// System.out.println("Completed (fake) Request in " + time / 1000.0 + "
+		// seconds.");
 
 		ArrayList<String> hist = (ArrayList<String>) session.getAttribute("history");
 		if (hist == null)
@@ -291,7 +404,7 @@ public class HelloRestController {
 		String classesList = returnClasses(classes);
 
 		long time = (System.currentTimeMillis() - t);
-		
+
 		ModelAndView model = new ModelAndView("/home");
 		// model.addObject("output", output);
 		model.addObject("course", course);

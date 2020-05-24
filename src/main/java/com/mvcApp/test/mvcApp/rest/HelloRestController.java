@@ -247,8 +247,8 @@ public class HelloRestController {
 	    for (String[] t2Pair : t2Times) {
 		String start2 = t2Pair[0];
 		String end2 = t2Pair[1];
-		if ((start1.compareTo(start2) < 0 && end1.compareTo(start2) > 0)
-			|| (start1.compareTo(end2) < 0 && start2.compareTo(start1) < 0)) {
+		if ((start1.compareTo(start2) <= 0 && end1.compareTo(start2) >= 0)
+			|| (start1.compareTo(end2) <= 0 && start2.compareTo(start1) <= 0)) {
 		    return true;
 		}
 	    }
@@ -295,7 +295,6 @@ public class HelloRestController {
 		String[] times = new String[] { s1 + "T" + begEnd[0], s1 + "T" + begEnd[1] };
 		if(!s.contains(times)) {
 		    s.add(times);
-		    System.out.println(Arrays.toString(times));
 		}
 	    }
 	}

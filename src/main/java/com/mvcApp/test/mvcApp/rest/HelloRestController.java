@@ -101,7 +101,41 @@ public class HelloRestController {
 	return dates;
     }
 
-    @RequestMapping("/calendar")
+    @RequestMapping("/get_calendar")
+    @ResponseBody
+    public String calendar_ajax(HttpSession session) {
+	HashMap<String, ArrayList<String[]>> s = new HashMap<String, ArrayList<String[]>>();
+	if (session.getAttribute("classes") != null) {
+	    ArrayList<String> classes = (ArrayList<String>) session.getAttribute("classes");
+	    for (String cls : classes) {
+		String label = cls.split(" -- ")[0];
+		ArrayList<String[]> times = getInfo(cls);
+		if (!s.containsKey(label))
+		    s.put(label, times);
+		else
+		    s.get(label).addAll(times);
+	    }
+	}
+
+	String output = "[";
+	for (Map.Entry<String, ArrayList<String[]>> me : s.entrySet()) {
+	    for (String[] day : me.getValue()) {
+		output += "{";
+		output += "\"title\": \"" + me.getKey() + "\",";
+		output += "\"start\": \"" + day[0] + "\",";
+		output += "\"end\": \"" + day[1] + "\",";
+		output += "\"tag\": \"" + day[2] + "\"";
+		output += "},";
+	    }
+	}
+	if (output.endsWith(","))
+	    output = output.substring(0, output.length() - 1);
+	output += "]";
+	// System.out.println(output);
+	return output;
+    }
+
+    @RequestMapping("/calenfdar")
     public void calendar(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 	/// ModelAndView mav = new ModelAndView("calendar.jsp");
 	HashMap<String, ArrayList<String[]>> s = new HashMap<String, ArrayList<String[]>>();
@@ -110,8 +144,10 @@ public class HelloRestController {
 	    for (String cls : classes) {
 		String label = cls.split(" -- ")[0];
 		ArrayList<String[]> times = getInfo(cls);
-		if (!s.containsKey(label)) s.put(label, times);
-		else s.get(label).addAll(times);
+		if (!s.containsKey(label))
+		    s.put(label, times);
+		else
+		    s.get(label).addAll(times);
 	    }
 	}
 
@@ -120,18 +156,12 @@ public class HelloRestController {
 	// s.put("CS 1200", new String[] { "2020-04-27T10:30:00", "2020-04-27T12:30:00"
 	// });
 	String output = "<script>var calendarEl = document.getElementById('calendar');"
-		+ "var calendar = new FullCalendar.Calendar(calendarEl, {"
-		+ "    	    plugins: [ 'timeGrid' ]," + "defaultView: 'timeGridWeek',"
-		+ "    	    defaultDate: '2020-04-20'," + "customButtons: {" + 
-			"    refresh: {" + 
-			"      text: 'refresh'," + 
-			"      click: function() {" + 
-			"        window.location.reload(true);" + 
-			"      }" + 
-			"    }" + 
-			"  }," + "header: {"
-		+ "    	      left: 'prev,next,refresh'," + "center: 'title',"
-		+ "    	      right: 'timeGridWeek'" + "},\r\n" + "events: [";
+		+ "var calendar = new FullCalendar.Calendar(calendarEl, {" + "    	    plugins: [ 'timeGrid' ],"
+		+ "defaultView: 'timeGridWeek'," + "    	    defaultDate: '2020-04-20'," + "customButtons: {"
+		+ "    refresh: {" + "      text: 'refresh'," + "      click: function() {"
+		+ "        window.location.reload(true);" + "      }" + "    }" + "  }," + "header: {"
+		+ "    	      left: 'prev,next,refresh'," + "center: 'title'," + "    	      right: 'timeGridWeek'"
+		+ "},\r\n" + "events: [";
 
 	for (Map.Entry<String, ArrayList<String[]>> me : s.entrySet()) {
 	    for (String[] day : me.getValue()) {
@@ -267,8 +297,9 @@ public class HelloRestController {
 	ArrayList<String[]> s = new ArrayList<String[]>();
 	// System.out.println("CLS: " + cls);
 	String[] info = cls.split("!!")[1].split("@@");
-	if (info.length == 3 || info.length == 4) {
-	    int pre = info.length - 3;
+	System.out.println(Arrays.toString(info));
+	if (info.length >= 3) {
+	    int pre = info.length % 3;
 	    String days = info[0 + pre];
 	    String timeRange = info[1 + pre];
 	    String room = info[2 + pre];
@@ -291,16 +322,18 @@ public class HelloRestController {
 		begEnd[0] = Integer.parseInt(begEnd[0].substring(0, 2)) + 12 + begEnd[0].substring(2, 5);
 	    else
 		begEnd[0] = begEnd[0].substring(0, 5);
-	    if (begEnd[1].contains("pm") && !begEnd[1].startsWith("12"))
+	    if (begEnd[1].contains("pm"))
 		begEnd[1] = Integer.parseInt(begEnd[1].substring(0, 2)) + 12 + begEnd[1].substring(2, 5);
 	    else
 		begEnd[1] = begEnd[1].substring(0, 5);
 
+	    System.out.println(begEnd[0] + " till " + begEnd[1]);
+
 	    timeRange = timeRange.replaceAll("am", "");
 	    ArrayList<String> ds = daysToArray(days);
 	    for (String s1 : ds) {
-		String[] times = new String[] { s1 + "T" + begEnd[0], s1 + "T" + begEnd[1] };
-		if(!s.contains(times)) {
+		String[] times = new String[] { s1 + "T" + begEnd[0], s1 + "T" + begEnd[1], cls };
+		if (!s.contains(times)) {
 		    s.add(times);
 		}
 	    }
@@ -421,6 +454,47 @@ public class HelloRestController {
 	SseEmitter emitter = sseEmitters.get(session.getId());
 	// System.out.println(session.getId() + " null?: " + (emitter == null));
 	return emitter;
+    }
+
+    @RequestMapping("get_courses")
+    @ResponseBody
+    public String get_courses(@RequestParam String course, @RequestParam String term, HttpSession session) {
+	System.out.println("RMP3 reporting");
+	String id = session.getId();
+	if (sseEmitters.containsKey(id)) {
+	    sseEmitters.get(id).complete();
+	}
+	newEmitterForUser(id);
+
+	// run test from streaming
+	if (course.toLowerCase().startsWith("cs ")) {
+	    course = course.toLowerCase().replace("cs ", "cs"); // quick fix for CS search issue
+	}
+	final String cc = course;
+	System.out.println(course + ": " + term);
+	Thread one = new Thread() {
+	    public void run() {
+		String id = session.getId();
+		UTDDB.rmp(cc, term, sseEmitters.get(id));
+		System.out.println("am bach");
+	    }
+	};
+	one.start();
+
+	ArrayList<String> hist = (ArrayList<String>) session.getAttribute("history");
+	if (hist == null)
+	    hist = new ArrayList<String>();
+	hist.add(course + "@@" + term);
+	String searchHistory = "";
+	for (int i = 0; i < hist.size(); i++) {
+	    String s = hist.get(i);
+	    String c1 = s.split("@@")[0];
+	    String c2 = s.split("@@")[1];
+	    String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
+	    searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
+	}
+	session.setAttribute("history", hist);
+	return searchHistory;
     }
 
     @RequestMapping("rmp")

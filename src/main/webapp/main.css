@@ -1,47 +1,60 @@
 @import url(https://fonts.googleapis.com/css?family=Alegreya+Sans);
 
 .modal {
-  display: none; 
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	display: none;
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	padding-top: 100px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0, 0, 0); /* Fallback color */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.removebtn {
+	color: black;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 13px;
+	height: 13px;
+	text-align: center;
+	border-radius: 50%;
+	font-size: 10px;
+	cursor: pointer;
+	background-color: #FFF;
 }
 
 /* Modal Content */
 .modal-content {
-  background-color: #161f27;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+	background-color: #161f27;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
 }
 
 /* The Close Button */
 .close {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+	color: #aaaaaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
+.close:hover, .close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
 }
 
 .dropdown {
-  position: relative;
-  display: inline-block;
-  width: 40%;
+	position: relative;
+	display: inline-block;
+	width: 40%;
 }
 
 .drop {
@@ -53,104 +66,127 @@
 }
 
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #000000;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+	display: none;
+	position: absolute;
+	background-color: #000000;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 1;
 }
 
 .dropdown-content a {
-  color: white;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
+	color: white;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
 }
 
-.dropdown-content a:hover {background-color: #222;}
+.dropdown-content a:hover {
+	background-color: #222;
+}
 
-.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content {
+	display: block;
+}
 
-.dropdown:hover .dropbtn {background-color: #0080ff;}
+.dropdown:hover .dropbtn {
+	background-color: #0080ff;
+}
 
-.mfp-iframe-holder{
+.mfp-iframe-holder {
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 }
 
-LABEL.indented-checkbox-text
-{
-  margin-left: 2em;
-  display: block;
-  position: relative;
-  margin-top: -1.4em;  /* make this margin match whatever your line-height is */
-  line-height: 1.4em;  /* can be set here, or elsewehere */
+LABEL.indented-checkbox-text {
+	margin-left: 2em;
+	display: block;
+	position: relative;
+	margin-top: -1.4em;
+	/* make this margin match whatever your line-height is */
+	line-height: 1.4em; /* can be set here, or elsewehere */
 }
 
 .tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
-  visibility: hidden;
-  width: 150px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  bottom: 110%;
-  left: 50%;
-  margin-left: -75px; /* Use half of the width (120/2 = 60), to center the tooltip */
+	visibility: hidden;
+	width: 150px;
+	background-color: black;
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px 0;
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 1;
+	bottom: 110%;
+	left: 50%;
+	margin-left: -75px;
+	/* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 .tooltip:hover .tooltiptext {
-  visibility: visible;
+	visibility: visible;
 }
 
 body {
 	max-width: 95%;
-	font-family: 'Alegreya Sans';	
-	margin-bottom:50px;
+	font-family: 'Alegreya Sans';
+	margin-bottom: 50px;
 }
 
-@-webkit-keyframes fontfix {
-    from { opacity: 1; }
-    to   { opacity: 1; }
+@
+-webkit-keyframes fontfix {from { opacity:1;
+	
 }
 
+to {
+	opacity: 1;
+}
+
+}
 td {
 	white-space: pre-line;
 }
 
 th
+
+
 [
 role
 =
 columnheader
 ]
+
+
 :not
+
  
+
 (
 .no-sort
+
  
+
 )
 {
 cursor
+
+
 :
+
  
+
 pointer
+
+
 ;
-
-
 }
 th[role=columnheader]:not (.no-sort ):after {
 	content: '';
@@ -271,15 +307,15 @@ th[role=columnheader]:not (.no-sort ):hover:after {
 }
 
 footer {
-    position: fixed;
-    height: 50px;
-    background-color: #161f27;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    margin-bottom: 0px;
-    padding-left: 20px;
-    padding-right: 20px;
+	position: fixed;
+	height: 50px;
+	background-color: #161f27;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin-bottom: 0px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 #clearHistory {
@@ -288,33 +324,32 @@ footer {
 }
 
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 /* Create two equal columns that floats next to each other */
 #column1 {
-  float: left;
-  width: 100%;
+	float: left;
+	width: 100%;
 }
 
 #column2 {
-  float: left;
-  width: 0%;
-  height: 94.5%;
-  position: fixed;
-  right: 0px;
-  top: 0px;
-  display: none;
+	float: left;
+	width: 0%;
+	height: 94.5%;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+	display: none;
 }
 
-.row {
-	// display: flex;
+.row { //
+	display: flex;
 }
 
 /* Clear floats after the columns */
 .row:after {
-  content: "";
-  display: table;
-  clear: both;
+	content: "";
+	display: table;
+	clear: both;
 }
-

@@ -31,8 +31,36 @@
     <script>
 
     document.addEventListener('DOMContentLoaded', function() {
-    	  var scr = ${events};
-    	  $('body').append(scr);
+		var calendarEl = document.getElementById('calendar');
+		var calendar = new FullCalendar.Calendar(calendarEl, {
+			plugins: [ 'timeGrid' ], 
+			defaultView: 'timeGridWeek',
+			defaultDate: '2020-04-20',
+			customButtons: {
+				refresh: {
+					text: 'refresh',
+					click: function() { 
+						window.location.reload(true); 
+					} 
+				} 
+			},
+			header: {
+				left: 'prev,next,refresh', 
+				center: 'title',
+				right: 'timeGridWeek'
+			}
+		});
+		calendar.render();
+		
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				// console.log(xhttp.responseText);
+				calendar.addEventSource(JSON.parse(xhttp.responseText));
+			}
+		};
+		xhttp.open("GET", "get_calendar", true);
+		xhttp.send();
     });
     </script>
   </head>

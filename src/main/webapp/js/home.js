@@ -90,31 +90,40 @@ function refresh_calendar() {
     xhttp.send();
 }
 
+function submit_ajax(){
+    new_feed();
+    startTime = Date.now();
+    ind = 0;
+    var req = $("[name='course']").val();
+    $('#search_string').text('Search Result for: ' + req);
+    document.title = req;
+    $.ajax({
+        type: "GET",
+        url: 'get_courses',
+        data: {
+            "course": req,
+            "term": $("[name='term']").val()
+        },
+        success: function(data) {
+            // console.log(data);
+            $('#loading>h2').text('Retrieving Coursebook...');
+            $("#professors > tbody").html("");
+            $("[name='course']").val('');
+            $('#search_history').html(data);
+        }
+    });
+}
+
 function onPageReady() {
     new_feed();
-    $('#request_courses').on('click', function() {
-	new_feed();
-	startTime = Date.now();
-	ind = 0;
-	var req = $("[name='course']").val();
-	$('#search_string').text('Search Result for: ' + req);
-	document.title = req;
-        $.ajax({
-            type: "GET",
-            url: 'get_courses',
-            data: {
-                "course": req,
-                "term": $("[name='term']").val()
-            },
-            success: function(data) {
-                // console.log(data);
-                $('#loading>h2').text('Retrieving Coursebook...');
-                $("#professors > tbody").html("");
-                $("[name='course']").val('');
-                $('#search_history').html(data);
-            }
-        });
+    
+    $("[name='course']").on('keypress',function(e) {
+        if(e.which == 13) {
+            submit_ajax();
+        }
     });
+    
+    $('#request_courses').on('click', submit_ajax);
 
     $('#open_schedule')
         .on(

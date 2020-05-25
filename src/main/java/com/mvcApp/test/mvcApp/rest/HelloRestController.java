@@ -297,7 +297,7 @@ public class HelloRestController {
 	ArrayList<String[]> s = new ArrayList<String[]>();
 	// System.out.println("CLS: " + cls);
 	String[] info = cls.split("!!")[1].split("@@");
-	System.out.println(Arrays.toString(info));
+	// System.out.println(Arrays.toString(info));
 	if (info.length >= 3) {
 	    int pre = info.length % 3;
 	    String days = info[0 + pre];
@@ -327,7 +327,7 @@ public class HelloRestController {
 	    else
 		begEnd[1] = begEnd[1].substring(0, 5);
 
-	    System.out.println(begEnd[0] + " till " + begEnd[1]);
+	    // System.out.println(begEnd[0] + " till " + begEnd[1]);
 
 	    timeRange = timeRange.replaceAll("am", "");
 	    ArrayList<String> ds = daysToArray(days);

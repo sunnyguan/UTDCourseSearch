@@ -52,7 +52,14 @@ public class HelloRestController {
     }
 
     @RequestMapping("/")
-    public String index() {
+    public String index(HttpSession session) {
+	String id = session.getId();
+	if (sseEmitters.containsKey(id)) {
+	    try {
+		sseEmitters.get(id).complete();
+	    } catch (Exception e) {}
+	}
+	newEmitterForUser(id);
 	return "index.html";
     }
 

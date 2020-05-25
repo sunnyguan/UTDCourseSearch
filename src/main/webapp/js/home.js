@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
     if (perfEntries[0].type === "back_forward") {
         location.reload(true);
     }
-
+    
 });
 
 /**
@@ -42,6 +42,10 @@ function new_feed() {
             // clearInterval(timer);
             sort.refresh();
             change_mode(popup_mode);
+            
+            $('.history_click').each( function() {
+                $(this).on('click', make_click);
+            });
 
             $('.add').each(function() {
                 var add = $(this);
@@ -62,6 +66,7 @@ function new_feed() {
                 }).toggle();
                 rearrange_colors();
             }
+            
             console.log('sse closed');
             sse.close();
         }
@@ -71,7 +76,29 @@ function new_feed() {
     };
 }
 
-
+function make_click() {
+    new_feed();
+    startTime = Date.now();
+    ind = 0;
+    var req = $(this).attr('course');
+    $('#search_string').text('Search Result for: ' + req);
+    document.title = req;
+    $.ajax({
+        type: "GET",
+        url: 'get_courses',
+        data: {
+            "course": req,
+            "term": $(this).attr('term')
+        },
+        success: function(data) {
+            // console.log(data);
+            $('#loading>h2').text('Retrieving Coursebook...');
+            $("#professors > tbody").html("");
+            $("[name='course']").val('');
+            $('#search_history').html(data);
+        }
+    });
+}
 function refresh_calendar() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -110,6 +137,10 @@ function submit_ajax(){
             $("#professors > tbody").html("");
             $("[name='course']").val('');
             $('#search_history').html(data);
+            
+            $('.history_click').each( function() {
+                $(this).on('click', make_click);
+            });
         }
     });
 }
@@ -291,6 +322,9 @@ function onPageReady() {
     });
 
     $('th').on('click', rearrange_colors);
+    
+    console.log($('.histry_click').length);
+    
 }
 
 var no_full = false;

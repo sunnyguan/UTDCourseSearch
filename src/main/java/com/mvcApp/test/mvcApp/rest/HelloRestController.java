@@ -223,7 +223,7 @@ public class HelloRestController {
 	    String s = hist.get(i);
 	    String c1 = s.split("@@")[0];
 	    String c2 = s.split("@@")[1];
-	    String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
+	    String cct = "<a term='" + c2 + "' course='" + c1 + "' href='#' class='history_click' >" + c1 + "</a>";
 	    searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
 	}
 
@@ -490,7 +490,7 @@ public class HelloRestController {
 	    String s = hist.get(i);
 	    String c1 = s.split("@@")[0];
 	    String c2 = s.split("@@")[1];
-	    String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
+	    String cct = "<a term='" + c2 + "' course='" + c1 + "' href='#' class='history_click' >" + c1 + "</a>";
 	    searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
 	}
 	session.setAttribute("history", hist);
@@ -539,7 +539,7 @@ public class HelloRestController {
 	    String s = hist.get(i);
 	    String c1 = s.split("@@")[0];
 	    String c2 = s.split("@@")[1];
-	    String cct = "<a href=\"rmp?term=" + c2 + "&course=" + c1 + "\">" + c1 + "</a>";
+	    String cct = "<a term='" + c2 + "' course='" + c1 + "' href='#' class='history_click' >" + c1 + "</a>";
 	    searchHistory += cct + (i == hist.size() - 1 ? "." : ", ");
 	}
 

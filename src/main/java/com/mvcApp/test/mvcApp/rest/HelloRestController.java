@@ -504,7 +504,9 @@ public class HelloRestController {
 
 	String id = session.getId();
 	if (sseEmitters.containsKey(id)) {
-	    sseEmitters.get(id).complete();
+	    try {
+		sseEmitters.get(id).complete();
+	    } catch (Exception e) {}
 	}
 	newEmitterForUser(id);
 	// System.out.println(session.getId() + " null?: " + (sseEmitters.get(id) ==

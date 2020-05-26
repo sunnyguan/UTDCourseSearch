@@ -378,7 +378,8 @@ public class UTDDB {
 		String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 
 		HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
-		String url = a.getAttribute("href").split("https://coursebook.utdallas.edu/search/")[1];
+		// System.out.println(a.getAttribute("href"));
+		String url = a.getAttribute("href").split("search/")[1];
 
 		String sect = "N/A";
 		try {

@@ -22,7 +22,11 @@ var ind = 0;
 var sse;
 function new_feed() {
     sse = new EventSource('feed');
-    
+    console.log('new sse created');
+    sse.onerror = function (e) {
+	// sse.close();
+	// console.log('error.');
+    };
     sse.onmessage = function(evt) {
         var data = evt.data;
         diff = Math.round((Date.now() - startTime) * 10) / 10000;

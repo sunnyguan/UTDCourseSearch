@@ -303,9 +303,14 @@ public class HelloRestController {
     public ArrayList<String[]> getInfo(String cls) {
 	ArrayList<String[]> s = new ArrayList<String[]>();
 	// System.out.println("CLS: " + cls);
-	String[] info = cls.split("!!")[1].split("@@");
+	String[] info = null;
+	try{
+	    info = cls.split("!!")[1].split("@@");
+	} catch (Exception e) {
+	    // no info
+	}
 	// System.out.println(Arrays.toString(info));
-	if (info.length >= 3) {
+	if (info != null && info.length >= 3) {
 	    int pre = info.length % 3;
 	    String days = info[0 + pre];
 	    String timeRange = info[1 + pre];

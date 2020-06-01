@@ -7,12 +7,20 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.messaging.MessagingException;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
 
 public class Test {
 
@@ -69,12 +77,16 @@ public class Test {
 	double rating;
 	double gpa;
 	int ratingCount;
+
 	@Override
 	public int compareTo(Object o) {
 	    Professor o2 = (Professor) o;
-	    if(o2.gpa != gpa) return (int) ((gpa - o2.gpa) * 100);
-	    else return (int) ((rating - o2.rating) * 100);
+	    if (o2.gpa != gpa)
+		return (int) ((gpa - o2.gpa) * 100);
+	    else
+		return (int) ((rating - o2.rating) * 100);
 	}
+
 	public Professor(String name, double rating, double gpa, int ratingCount) {
 	    super();
 	    this.name = name;
@@ -83,8 +95,33 @@ public class Test {
 	    this.ratingCount = ratingCount;
 	}
     }
-    
-    public static void main(String[] args) throws MessagingException, InterruptedException, FileNotFoundException {
+
+    public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+	WebClient client = new WebClient(BrowserVersion.BEST_SUPPORTED);
+	client.getOptions().setCssEnabled(false);
+	client.getOptions().setJavaScriptEnabled(false);
+	client.getOptions().setThrowExceptionOnFailingStatusCode(false);
+	client.getOptions().setPrintContentOnFailingStatusCode(false);
+	client.getOptions().setThrowExceptionOnScriptError(false);
+	client.getOptions().setJavaScriptEnabled(false);
+	client.setCssErrorHandler(new SilentCssErrorHandler());
+	client.setHTMLParserListener(new HTMLParserListener() {
+	    @Override
+	    public void error(String message, java.net.URL url, String html, int line, int column, String key) {
+
+	    }
+
+	    @Override
+	    public void warning(String message, java.net.URL url, String html, int line, int column, String key) {
+
+	    }
+	});
+	String searchUrl = "https://coursebook.utdallas.edu/CHEM";
+	HtmlPage page = client.getPage(searchUrl);
+	System.out.println(page.getTitleText());
+    }
+
+    public static void mainf(String[] args) throws MessagingException, InterruptedException, FileNotFoundException {
 	readProfToGPA();
 	readProfToRating();
 	int i = 0;
@@ -109,15 +146,15 @@ public class Test {
 		}
 	    }
 	}
-	
+
 	Collections.sort(profs);
-	for(Professor p : profs) {
-	    System.out.println(p.name + ": GPA is " + p.gpa + ", RMP is " + p.rating + " with " + p.ratingCount + " ratings.");
+	for (Professor p : profs) {
+	    System.out.println(
+		    p.name + ": GPA is " + p.gpa + ", RMP is " + p.rating + " with " + p.ratingCount + " ratings.");
 	    myPlot.addPoint(p.gpa, p.rating);
 	    Thread.sleep(100);
 	}
-	
-	
+
 	System.out.println("done");
 	pw.close();
     }

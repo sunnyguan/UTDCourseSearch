@@ -391,10 +391,9 @@ public class UTDDB {
 		// line += "<tr>";
 		line += "<td>" + open + "</td>";
 		line += "<td>" + sect + "</td>";
-		line += "<td><a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id="
-			+ url + "\">";
+		line += "<td>"; // <a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id="			+ url + "\">
 		if (name.contains("CV Honors"))
-		    line += "<b>" + formatName + "</b></a></td>";
+		    line += "<b>" + formatName + "</b></td>"; // </a>
 		else
 		    line += formatName + "</a></td>";
 		line += "<td>" + prof + "</td>";

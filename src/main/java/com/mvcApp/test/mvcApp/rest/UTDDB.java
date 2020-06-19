@@ -342,12 +342,25 @@ public class UTDDB {
 	    HttpResponse<String> response = Unirest.post("http://salty-cove-22105.herokuapp.com/api/course")
 		    .header("Content-Type", "application/json").body("{\"query\":\"" + searchQuery + "\"}").asString();
 	    String resp = response.getBody(); //.substring(21);
-	    System.out.println(response.getBody());
+	    System.out.println(response.getBody());	
 
 	    System.out
 		    .println(padRight("Retrieving CourseBook: ", 40) + (System.currentTimeMillis() - timeTrack) + "ms");
-
-	    JSONArray arr = new JSONArray(resp);
+	    JSONArray arr = null;
+	    try {
+		arr = new JSONArray(resp);
+	    } catch (Exception e) {
+		if (se != null) {
+		    try {
+			se.send(SseEmitter.event().data("bad"));
+		    } catch (Exception e1) {
+			System.out.println("bye bye 0");
+			return "remove me";
+		    }
+		}
+		return "bad";
+	    }
+	    
 	    for (int i = 0; i < arr.length(); i++) {
 		JSONObject row = arr.getJSONObject(i);
 

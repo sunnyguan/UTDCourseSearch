@@ -488,7 +488,8 @@ public class HelloRestController {
 	    public void run() {
 		System.out.println("Here");
 		String id = session.getId();
-		UTDDB.rmp(cc, term, sseEmitters.get(id));
+		String output = UTDDB.rmp(cc, term, sseEmitters.get(id));
+		
 		System.out.println("am bach");
 	    }
 	};

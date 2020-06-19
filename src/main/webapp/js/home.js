@@ -31,7 +31,7 @@ function new_feed() {
         var data = evt.data;
         diff = Math.round((Date.now() - startTime) * 10) / 10000;
         $('#time').text(diff);
-        if (data !== "done") {
+        if (data !== "done" && data !== "bad") {
             $('#loading>h2').text("Retrieving Results #" + ind++);
             var el = document.getElementById('bod');
             var z = document.createElement('tr');
@@ -39,8 +39,14 @@ function new_feed() {
             el.appendChild(z);
             // if(ind % 20 == 0) sort.refresh();
         } else {
-            $('#loading>h2').text(
-                "Found " + ind + " results in " + diff + " seconds.");
+            if(data === "bad"){
+        	$('#loading>h2').text(
+                        "Coursebook timed out; please try again.");
+            } else {
+        	$('#loading>h2').text(
+                        "Found " + ind + " results in " + diff + " seconds.");
+            }
+            
             // setTimeout(function(){ $('#loading').hide(); }, 2000);
             // Documentation: http://tristen.ca/tablesort/demo/
             // clearInterval(timer);

@@ -11,9 +11,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
@@ -22,9 +25,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
-import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 import com.gargoylesoftware.htmlunit.html.HtmlUnorderedList;
 import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 
 @SuppressWarnings("unchecked")
 public class UTDDB {
@@ -325,32 +329,41 @@ public class UTDDB {
 		+ "<th role=\"columnheader\">Schedule</th>" + "<th role=\"columnheader\">Add Class (Not Galaxy)</th>"
 		+ "</tr></thead>";
 	String line = "";
-	String searchQuery = course.trim().replace(" ", "/") + "/" + term + "?";
+	String searchQuery = course.trim(); // .replace(" ", "/") + "/" + term + "?";
 	long timeTrack = System.currentTimeMillis();
 	if (client == null)
 	    init();
 	profToRating.put("-Staff-", no_rmp_data);
 	try {
-	    String searchUrl = "https://coursebook.utdallas.edu/" + searchQuery;
-	    HtmlPage page = client.getPage(searchUrl);
+	    // String searchUrl = "https://coursebook.utdallas.edu/search";
+	    // HtmlPage page = client.getPage(searchUrl);
+
+	    Unirest.setTimeouts(0, 0);
+	    HttpResponse<String> response = Unirest.post("http://salty-cove-22105.herokuapp.com/api/course")
+		    .header("Content-Type", "application/json").body("{\"query\":\"" + searchQuery + "\"}").asString();
+	    String resp = response.getBody(); //.substring(21);
+	    System.out.println(response.getBody());
 
 	    System.out
 		    .println(padRight("Retrieving CourseBook: ", 40) + (System.currentTimeMillis() - timeTrack) + "ms");
 
-	    List l = page.getByXPath("//*/td[4]");
+	    JSONArray arr = new JSONArray(resp);
+	    for (int i = 0; i < arr.length(); i++) {
+		JSONObject row = arr.getJSONObject(i);
 
-	    for (int section = 1; section <= l.size(); section++) {
-		// Thread.sleep(1000);
 		timeTrack = System.currentTimeMillis();
+		//
 
-		HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
+		String ufOpen = row.getString("0");
+		String open = "";
+		if (ufOpen.contains("Open"))
+		    open = "Open";
+		else if (ufOpen.contains("Full"))
+		    open = "Full";
 
-		HtmlSpan openSpan = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
-		String open = (openSpan == null) ? "Unknown" : openSpan.asText();
-
-		String name = tr.getCell(2).asText();
-		String prof = tr.getCell(3).asText();
-		String time = tr.getCell(4).asText();
+		String name = row.getString("1").split("\\.")[0];
+		String prof = row.getString("3");
+		String time = row.getString("4");
 
 		if (prof.contains(",")) {
 		    prof = prof.split(",")[0].trim(); // if two or more professors for one section, only
@@ -377,21 +390,15 @@ public class UTDDB {
 
 		String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 
-		HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
-		// System.out.println(a.getAttribute("href"));
-		String url = a.getAttribute("href").split("search/")[1];
-
-		String sect = "N/A";
-		try {
-		    String[] cc = url.split("\\.")[0].split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-		    sect = cc[0].toUpperCase() + " " + cc[1];
-		} catch (Exception e) {
-		}
+		String url = row.getString("1").split("\n")[0];
+		String sect = url.split("\n")[0];
 
 		// line += "<tr>";
 		line += "<td>" + open + "</td>";
 		line += "<td>" + sect + "</td>";
-		line += "<td>"; // <a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id="			+ url + "\">
+		line += "<td>"; // <a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\"
+				// href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url +
+				// "\">
 		if (name.contains("CV Honors"))
 		    line += "<b>" + formatName + "</b></td>"; // </a>
 		else
@@ -409,7 +416,7 @@ public class UTDDB {
 		}
 
 		String subj = sect.split(" ")[0];
-		String num = sect.split(" ")[1];
+		String num = sect.split(" ")[1].split("\\.")[0];
 		String pr = prof.contains("Staff") ? "" : prof;
 		String searchString = "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof="
 			+ pr;
@@ -424,15 +431,15 @@ public class UTDDB {
 		time = time.replaceAll("\r", "");
 		String[] timeInfo = time.split("\n");
 		// System.out.println("Time: " + time);
-		int i = !timeInfo[0].contains("day") ? 1 : 0;
+		int i1 = !timeInfo[0].contains("day") ? 1 : 0;
 		String timeFormatted = "";
 		if (timeInfo.length != 0 && timeInfo.length % 3 == 1) {
 		    timeFormatted = timeInfo[0] + " ";
 		}
-		while (i < timeInfo.length) {
-		    String days = timeInfo[i++];
-		    String timeRange = timeInfo[i++];
-		    String location = timeInfo[i++];
+		while (i1 < timeInfo.length) {
+		    String days = timeInfo[i1++];
+		    String timeRange = timeInfo[i1++];
+		    String location = timeInfo[i1++];
 
 		    days = days.replace("Tuesday & Thursday", "TTh");
 		    days = days.replace("Monday & Wednesday", "MW");
@@ -459,7 +466,134 @@ public class UTDDB {
 		line = "";
 		System.out
 			.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
+
 	    }
+
+//	    List l = page.getByXPath("//*/td[4]");
+//
+//	    for (int section = 1; section <= l.size(); section++) {
+//		// Thread.sleep(1000);
+//		timeTrack = System.currentTimeMillis();
+//
+//		HtmlTableRow tr = (HtmlTableRow) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]");
+//
+//		HtmlSpan openSpan = (HtmlSpan) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[1]/span");
+//		String open = (openSpan == null) ? "Unknown" : openSpan.asText();
+//
+//		String name = tr.getCell(2).asText();
+//		String prof = tr.getCell(3).asText();
+//		String time = tr.getCell(4).asText();
+//
+//		if (prof.contains(",")) {
+//		    prof = prof.split(",")[0].trim(); // if two or more professors for one section, only
+//						      // retreive RMP for the first
+//		}
+//
+//		String rating = no_rmp_data;
+//		if (!profToRating.containsKey(prof)) {
+//		    System.out.println("Professor not found in database, searching RMP for: " + prof);
+//		    rating = rating(prof);
+//		} else {
+//		    rating = profToRating.get(prof);
+//		}
+//
+//		String avgGPA = profToGPA.containsKey(prof) ? profToGPA.get(prof) : no_gpa_data;
+//		String overallRating = "0 (N/A)";
+//		double gpaWeight = 70;
+//		if (!rating.equals(no_rmp_data) && !avgGPA.equals(no_gpa_data)) {
+//		    double db_avgGPA = Double.parseDouble(avgGPA.split(" ")[0]) / 4;
+//		    double db_rating = Double.parseDouble(rating.split(" ")[0]) / 5;
+//		    double scores = db_rating * (100 - gpaWeight) + db_avgGPA * gpaWeight;
+//		    overallRating = Math.round(scores * 100) / 100.0 + "";
+//		}
+//
+//		String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
+//
+//		HtmlAnchor a = (HtmlAnchor) page.getFirstByXPath("//*[@id=\"r-" + section + "\"]/td[2]/a");
+//		// System.out.println(a.getAttribute("href"));
+//		String url = a.getAttribute("href").split("search/")[1];
+//
+//		String sect = "N/A";
+//		try {
+//		    String[] cc = url.split("\\.")[0].split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+//		    sect = cc[0].toUpperCase() + " " + cc[1];
+//		} catch (Exception e) {
+//		}
+//
+//		// line += "<tr>";
+//		line += "<td>" + open + "</td>";
+//		line += "<td>" + sect + "</td>";
+//		line += "<td>"; // <a class='popup_details' target=\"_blank\" rel=\"noopener noreferrer\"
+//				// href=\"https://coursebook.utdallas.edu/clips/clip-section-v2.zog?id=" + url +
+//				// "\">
+//		if (name.contains("CV Honors"))
+//		    line += "<b>" + formatName + "</b></td>"; // </a>
+//		else
+//		    line += formatName + "</a></td>";
+//		line += "<td>" + prof + "</td>";
+//
+//		if (rating.equals(no_rmp_data)) {
+//		    line += "<td>" + rating + "</td>";
+//		} else {
+//		    String gtid = "";
+//		    gtid = rating.split("@@")[1];
+//		    rating = rating.split("@@")[0];
+//		    line += "<td><a class='popup_rmp' href=\"https://www.ratemyprofessors.com/ShowRatings.jsp?tid="
+//			    + gtid + "\">" + rating + "</a></td>";
+//		}
+//
+//		String subj = sect.split(" ")[0];
+//		String num = sect.split(" ")[1];
+//		String pr = prof.contains("Staff") ? "" : prof;
+//		String searchString = "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof="
+//			+ pr;
+//
+//		if (avgGPA.equals(no_gpa_data))
+//		    line += "<td>" + avgGPA + "</td>";
+//		else
+//		    line += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
+//		line += "<td>" + overallRating + "</td>"; // data-sort-method='number'
+//
+//		// time shortening
+//		time = time.replaceAll("\r", "");
+//		String[] timeInfo = time.split("\n");
+//		// System.out.println("Time: " + time);
+//		int i = !timeInfo[0].contains("day") ? 1 : 0;
+//		String timeFormatted = "";
+//		if (timeInfo.length != 0 && timeInfo.length % 3 == 1) {
+//		    timeFormatted = timeInfo[0] + " ";
+//		}
+//		while (i < timeInfo.length) {
+//		    String days = timeInfo[i++];
+//		    String timeRange = timeInfo[i++];
+//		    String location = timeInfo[i++];
+//
+//		    days = days.replace("Tuesday & Thursday", "TTh");
+//		    days = days.replace("Monday & Wednesday", "MW");
+//		    days = days.replace("Monday, Wednesday, Friday", "MWF");
+//		    days = days.replace("Monday & Wednesday", "MW");
+//
+//		    timeFormatted += days + " " + timeRange + " " + location + "\n";
+//		}
+//
+//		line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "!!"
+//			+ time.replaceAll("\n", "@@") + "' onclick='addCourse(this)'>Add</a></td>";
+//		line += "<td>" + timeFormatted + "</td>";
+//
+//		// line += "</tr>";
+//		output += line;
+//		if (se != null) {
+//		    try {
+//			se.send(SseEmitter.event().data(line));
+//		    } catch (Exception e) {
+//			System.out.println("bye bye 1");
+//			return "remove me";
+//		    }
+//		}
+//		line = "";
+//		System.out
+//			.println("Processing " + padRight(prof, 40) + (System.currentTimeMillis() - timeTrack) + "ms");
+//	    }
 	    output += "</table>";
 	} catch (Exception e) {
 	    e.printStackTrace();

@@ -15,12 +15,11 @@ import java.util.Map;
 
 import org.springframework.messaging.MessagingException;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class Test {
 
@@ -96,29 +95,12 @@ public class Test {
 	}
     }
 
-    public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-	WebClient client = new WebClient(BrowserVersion.BEST_SUPPORTED);
-	client.getOptions().setCssEnabled(false);
-	client.getOptions().setJavaScriptEnabled(false);
-	client.getOptions().setThrowExceptionOnFailingStatusCode(false);
-	client.getOptions().setPrintContentOnFailingStatusCode(false);
-	client.getOptions().setThrowExceptionOnScriptError(false);
-	client.getOptions().setJavaScriptEnabled(false);
-	client.setCssErrorHandler(new SilentCssErrorHandler());
-	client.setHTMLParserListener(new HTMLParserListener() {
-	    @Override
-	    public void error(String message, java.net.URL url, String html, int line, int column, String key) {
-
-	    }
-
-	    @Override
-	    public void warning(String message, java.net.URL url, String html, int line, int column, String key) {
-
-	    }
-	});
-	String searchUrl = "https://coursebook.utdallas.edu/CHEM";
-	HtmlPage page = client.getPage(searchUrl);
-	System.out.println(page.getTitleText());
+    public static void main(String[] args) throws FailingHttpStatusCodeException, MalformedURLException, IOException,
+	    UnirestException, InterruptedException {
+	Unirest.setTimeouts(0, 0);
+	HttpResponse<String> response = Unirest.post("http://salty-cove-22105.herokuapp.com/api/course")
+		.header("Content-Type", "application/json").body("{\"query\":\"govt\"}").asString();
+	System.out.println(response.getBody());
     }
 
     public static void mainf(String[] args) throws MessagingException, InterruptedException, FileNotFoundException {

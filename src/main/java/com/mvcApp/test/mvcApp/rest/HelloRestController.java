@@ -486,6 +486,7 @@ public class HelloRestController {
 	System.out.println(course + ": " + term);
 	Thread one = new Thread() {
 	    public void run() {
+		System.out.println("Here");
 		String id = session.getId();
 		UTDDB.rmp(cc, term, sseEmitters.get(id));
 		System.out.println("am bach");

@@ -361,7 +361,7 @@ public class UTDDB {
 		else if (ufOpen.contains("Full"))
 		    open = "Full";
 
-		String name = row.getString("1").split("\\.")[0];
+		String name = row.getString("2").split("\\(")[0];
 		String prof = row.getString("3");
 		String time = row.getString("4");
 

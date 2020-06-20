@@ -31,7 +31,7 @@ function new_feed() {
         var data = evt.data;
         diff = Math.round((Date.now() - startTime) * 10) / 10000;
         $('#time').text(diff);
-        if (data !== "done" && data !== "bad") {
+        if (data !== "done" && data !== "bad" && data !== "bigbad") {
             $('#loading>h2').text("Retrieving Results #" + ind++);
             var el = document.getElementById('bod');
             var z = document.createElement('tr');
@@ -40,11 +40,11 @@ function new_feed() {
             // if(ind % 20 == 0) sort.refresh();
         } else {
             if(data === "bad"){
-        	$('#loading>h2').text(
-                        "Coursebook timed out; please try again.");
+        	$('#loading>h2').text("No results found.");
+            } else if (data === "bigbad"){
+        	$('#loading>h2').text("Coursebook timed out; please try again.");
             } else {
-        	$('#loading>h2').text(
-                        "Found " + ind + " results in " + diff + " seconds.");
+        	$('#loading>h2').text("Found " + ind + " results in " + diff + " seconds.");
             }
             
             // setTimeout(function(){ $('#loading').hide(); }, 2000);

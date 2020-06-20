@@ -342,21 +342,22 @@ public class UTDDB {
 	    Unirest.setTimeouts(0, 0);
 	    HttpResponse<String> response = Unirest.post("http://salty-cove-22105.herokuapp.com/api/course")
 		    .header("Content-Type", "application/json").body("{\"query\":\"" + searchQuery + "\"}").asString();
-	    String resp = response.getBody(); //.substring(21);
-	    System.out.println(response.getBody());	
+	    String resp = response.getBody(); // .substring(21);
+	    System.out.println(response.getBody());
 
 	    System.out
 		    .println(padRight("Retrieving CourseBook: ", 40) + (System.currentTimeMillis() - timeTrack) + "ms");
-	    JSONArray arr = null;
-	    try {
-		arr = new JSONArray(resp);
-		if(arr.getJSONObject(0).has("bad")) {
-		    throw new Exception();
-		}
-	    } catch (Exception e) {
+	    JSONArray arr = new JSONArray(resp);
+	    String status = "";
+	    if (arr.getJSONObject(0).has("bad")) {
+		status = "bad";
+	    } else if (arr.getJSONObject(0).has("bigbad")) {
+		status = "bigbad";
+	    }
+	    if (!status.equals("")) {
 		if (se != null) {
 		    try {
-			se.send(SseEmitter.event().data("bad"));
+			se.send(SseEmitter.event().data(status));
 		    } catch (Exception e1) {
 			System.out.println("bye bye 0");
 			return "remove me";
@@ -364,7 +365,7 @@ public class UTDDB {
 		}
 		return "bad";
 	    }
-	    
+
 	    for (int i = 0; i < arr.length(); i++) {
 		JSONObject row = arr.getJSONObject(i);
 
@@ -451,8 +452,8 @@ public class UTDDB {
 		if (timeInfo.length != 0 && timeInfo.length % 3 == 1) {
 		    timeFormatted = timeInfo[0] + " ";
 		}
-		
-		while (i1+2 < timeInfo.length) {
+
+		while (i1 + 2 < timeInfo.length) {
 		    String days = timeInfo[i1++];
 		    String timeRange = timeInfo[i1++];
 		    String location = timeInfo[i1++];
@@ -464,8 +465,9 @@ public class UTDDB {
 
 		    timeFormatted += days + " " + timeRange + " " + location + "\n";
 		}
-		
-		if(timeFormatted.equals("")) timeFormatted = time.replaceAll("\\n", " ");
+
+		if (timeFormatted.equals(""))
+		    timeFormatted = time.replaceAll("\\n", " ");
 
 		line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "!!"
 			+ time.replaceAll("\n", "@@") + "' onclick='addCourse(this)'>Add</a></td>";

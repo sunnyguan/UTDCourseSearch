@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -378,7 +379,7 @@ public class UTDDB {
 		    open = "Full";
 
 		String name = row.getString("2").split("\\(")[0];
-		String prof = row.getString("3");
+		String prof = row.getString("3").trim();
 		String time = row.getString("4");
 
 		if (prof.contains(",")) {
@@ -442,7 +443,7 @@ public class UTDDB {
 		else
 		    line += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
 		line += "<td>" + overallRating + "</td>"; // data-sort-method='number'
-
+		System.out.println(time);
 		// time shortening
 		time = time.replaceAll("\r", "");
 		String[] timeInfo = time.split("\n");
@@ -452,6 +453,7 @@ public class UTDDB {
 		if (timeInfo.length != 0 && timeInfo.length % 3 == 1) {
 		    timeFormatted = timeInfo[0] + " ";
 		}
+		
 		while (i1 < timeInfo.length) {
 		    String days = timeInfo[i1++];
 		    String timeRange = timeInfo[i1++];

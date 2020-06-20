@@ -349,6 +349,9 @@ public class UTDDB {
 	    JSONArray arr = null;
 	    try {
 		arr = new JSONArray(resp);
+		if(arr.getJSONObject(0).has("bad")) {
+		    throw new Exception();
+		}
 	    } catch (Exception e) {
 		if (se != null) {
 		    try {

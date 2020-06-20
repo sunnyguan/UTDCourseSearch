@@ -408,7 +408,7 @@ public class UTDDB {
 		String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 
 		String url = row.getString("1").split("\n")[0];
-		String sect = url.split("\n")[0];
+		String sect = url.split("\\.")[0];
 
 		// line += "<tr>";
 		line += "<td>" + open + "</td>";
@@ -454,7 +454,7 @@ public class UTDDB {
 		    timeFormatted = timeInfo[0] + " ";
 		}
 		
-		while (i1 < timeInfo.length) {
+		while (i1+2 < timeInfo.length) {
 		    String days = timeInfo[i1++];
 		    String timeRange = timeInfo[i1++];
 		    String location = timeInfo[i1++];
@@ -466,6 +466,8 @@ public class UTDDB {
 
 		    timeFormatted += days + " " + timeRange + " " + location + "\n";
 		}
+		
+		if(timeFormatted.equals("")) timeFormatted = time.replaceAll("\\n", " ");
 
 		line += "<td><a class='add' value='" + sect + " -- " + prof + " -- " + overallRating + "!!"
 			+ time.replaceAll("\n", "@@") + "' onclick='addCourse(this)'>Add</a></td>";

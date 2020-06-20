@@ -443,11 +443,9 @@ public class UTDDB {
 		else
 		    line += "<td><a class=\"popup_grade\" href=\"" + searchString + "\">" + avgGPA + "</a></td>";
 		line += "<td>" + overallRating + "</td>"; // data-sort-method='number'
-		System.out.println(time);
 		// time shortening
 		time = time.replaceAll("\r", "");
 		String[] timeInfo = time.split("\n");
-		// System.out.println("Time: " + time);
 		int i1 = !timeInfo[0].contains("day") ? 1 : 0;
 		String timeFormatted = "";
 		if (timeInfo.length != 0 && timeInfo.length % 3 == 1) {

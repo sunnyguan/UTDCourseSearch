@@ -251,21 +251,23 @@ public class UTDDB {
     public static List<Professor> rmpAPI(String[] names) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 	List<Professor> professors = new ArrayList<Professor>();
 	for (String name : names) {
-	    if (!profToRating.containsKey(name)) {
+	    if (!profToRating.containsKey(name))
 		rating(name);
-	    }
+	    if (!profToGPA.containsKey(name))
+		profToGPA.put(name, no_gpa_data);
+	    String avgGPA = profToGPA.get(name);
 	    String[] result = profToRating.get(name).split("@@");
 	    if(result.length != 2) {
-		professors.add(new Professor("N/A", "N/A", "N/A"));
+		professors.add(new Professor("N/A", "N/A", "N/A", avgGPA));
 	    } else {
-		Professor p = new Professor(name, result[0], result[1]);
+		Professor p = new Professor(name, result[0], result[1], avgGPA);
 		professors.add(p);
 	    }
 	    
 	}
 	return professors;
     }
-
+    
     private static String SCHOOL = "The University of Texas at Dallas";
     private static String URL_rmp = "https://www.ratemyprofessors.com/search.jsp?query=";
 

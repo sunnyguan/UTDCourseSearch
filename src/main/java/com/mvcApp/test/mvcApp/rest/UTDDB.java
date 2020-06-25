@@ -9,9 +9,9 @@ import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -246,6 +246,24 @@ public class UTDDB {
 	}
 
 	return output;
+    }
+
+    public static List<Professor> rmpAPI(String[] names) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+	List<Professor> professors = new ArrayList<Professor>();
+	for (String name : names) {
+	    if (!profToRating.containsKey(name)) {
+		rating(name);
+	    }
+	    String[] result = profToRating.get(name).split("@@");
+	    if(result.length != 2) {
+		professors.add(new Professor("N/A", "N/A", "N/A"));
+	    } else {
+		Professor p = new Professor(name, result[0], result[1]);
+		professors.add(p);
+	    }
+	    
+	}
+	return professors;
     }
 
     private static String SCHOOL = "The University of Texas at Dallas";

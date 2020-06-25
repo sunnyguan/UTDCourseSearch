@@ -5,23 +5,28 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @EnableScheduling
 @Controller
@@ -29,6 +34,7 @@ public class HelloRestController {
 
     public static final boolean FORCENEW = true;
     SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+    Gson gson = new Gson();
 
     // @Scheduled(cron = "0 1 1 * * ?")
     @RequestMapping("/updateDB")
@@ -57,10 +63,22 @@ public class HelloRestController {
 	if (sseEmitters.containsKey(id)) {
 	    try {
 		sseEmitters.get(id).complete();
-	    } catch (Exception e) {}
+	    } catch (Exception e) {
+	    }
 	}
 	newEmitterForUser(id);
 	return "index.html";
+    }
+
+    @RequestMapping("/api/rmp")
+    @ResponseBody
+    @CrossOrigin
+    public String rmpAPI(@RequestParam String[] names) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+	List<Professor> professors = UTDDB.rmpAPI(names);
+	String element = gson.toJson(professors,
+		new TypeToken<ArrayList<Professor>>() {}.getType());
+	System.out.println("Request with " + names.length + " names, successfully returned json array with length " + professors.size() + ".");
+	return element;
     }
 
     @RequestMapping("/result")
@@ -304,7 +322,7 @@ public class HelloRestController {
 	ArrayList<String[]> s = new ArrayList<String[]>();
 	// System.out.println("CLS: " + cls);
 	String[] info = null;
-	try{
+	try {
 	    info = cls.split("!!")[1].split("@@");
 	} catch (Exception e) {
 	    // no info
@@ -489,7 +507,7 @@ public class HelloRestController {
 		System.out.println("Here");
 		String id = session.getId();
 		String output = UTDDB.rmp(cc, term, sseEmitters.get(id));
-		
+
 		System.out.println("am bach");
 	    }
 	};
@@ -520,7 +538,8 @@ public class HelloRestController {
 	if (sseEmitters.containsKey(id)) {
 	    try {
 		sseEmitters.get(id).complete();
-	    } catch (Exception e) {}
+	    } catch (Exception e) {
+	    }
 	}
 	newEmitterForUser(id);
 	// System.out.println(session.getId() + " null?: " + (sseEmitters.get(id) ==

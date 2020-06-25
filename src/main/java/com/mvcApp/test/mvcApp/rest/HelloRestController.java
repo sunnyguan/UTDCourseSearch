@@ -77,7 +77,7 @@ public class HelloRestController {
 	List<Professor> professors = UTDDB.rmpAPI(names);
 	String element = gson.toJson(professors,
 		new TypeToken<ArrayList<Professor>>() {}.getType());
-	System.out.println("Request with " + names.length + " names, successfully returned json array with length " + professors.size() + ".");
+	// System.out.println("Request with " + names.length + " names, successfully returned json array with length " + professors.size() + ".");
 	return element;
     }
 

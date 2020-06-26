@@ -94,6 +94,7 @@
 						<div class="dropdown-content">${classes}</div>
 					</div>
 				<h2 id="search_string">Search Result for: ${course}</h2>
+				<h4>Try out <a href="https://utdrmp-ng.herokuapp.com">the mobile-friendly site (work-in-progress)</a> if you're on a mobile device!</h4>
 				<p>
 					Number of Professors in Database: ${numProfs}, Time taken (seconds):
 					<span id="time">${time}</span>

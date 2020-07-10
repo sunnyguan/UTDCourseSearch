@@ -159,7 +159,11 @@
 					<tr data-sort-method="none">
 						<th>Status</th>
 						<th role="columnheader">Course</th>
-						<th role="columnheader">Type</th>
+						<th role="columnheader">
+							<div class="tooltip">
+								Type<span class="tooltiptext">Instruction Type (Pending = Processing)</span>
+							</div>
+						</th>
 						<th role="columnheader">Name</th>
 						<th role="columnheader">Professor</th>
 						<th role="columnheader">Rating</th>

@@ -31,4 +31,5 @@ build/
 .vscode/
 
 ### local searches ###
-
+*~
+*swp

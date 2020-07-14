@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 @EnableScheduling
 @Controller
-@CrossOrigin(origins = "https://coursebook.utdallas.edu/search")
+@CrossOrigin(origins = "*")
 public class HelloRestController {
 
   public static final boolean FORCENEW = true;

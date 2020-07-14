@@ -27,6 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 @EnableScheduling
 @Controller
+@CrossOrigin(origins = "*")
 public class HelloRestController {
 
   public static final boolean FORCENEW = true;
@@ -69,7 +70,6 @@ public class HelloRestController {
 
   @RequestMapping("/api/rmp")
   @ResponseBody
-  @CrossOrigin
   public String rmpAPI(@RequestParam String[] names)
       throws FailingHttpStatusCodeException, MalformedURLException, IOException {
     List<Professor> professors = UTDDB.rmpAPI(names);

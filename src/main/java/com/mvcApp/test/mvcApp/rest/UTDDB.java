@@ -290,47 +290,47 @@ public class UTDDB {
     HtmlPage rmp;
     try {
       rmp = client.getPage(url);
+      HtmlUnorderedList allProfs =
+          (HtmlUnorderedList) rmp.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
+      int index = -1;
+
+      if (allProfs == null) {
+        profToRating.put(prof, no_rmp_data);
+        return rating;
+      }
+
+      for (int i = 1; i <= allProfs.getChildElementCount() && index == -1; i++) {
+        HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
+            "//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
+        if (school != null && school.asText().contains(SCHOOL)) {
+          index = i;
+        }
+      }
+
+      if (index != -1) {
+        HtmlAnchor a = (HtmlAnchor) rmp
+            .getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
+        rmp = a.click();
+        String tid = rmp.getUrl().toString().split("=")[1];
+
+        rating = ((HtmlDivision) rmp.getFirstByXPath(
+            "//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]")).asText();
+
+        if (!rating.contains("N/A")) {
+          rating += " based on " + ((HtmlAnchor) rmp.getFirstByXPath(
+              "//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a")).asText();
+        } else {
+          rating = no_rmp_data;
+        }
+        rating += "@@" + tid;
+      }
+
+      profToRating.put(prof, rating);
+      return rating;
     } catch (Exception e) {
+      System.out.println("Exception occurred!");
       return no_rmp_data;
     }
-    HtmlUnorderedList allProfs =
-        (HtmlUnorderedList) rmp.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
-    int index = -1;
-
-    if (allProfs == null) {
-      profToRating.put(prof, no_rmp_data);
-      return rating;
-    }
-
-    for (int i = 1; i <= allProfs.getChildElementCount() && index == -1; i++) {
-      HtmlSpan school = (HtmlSpan) rmp.getFirstByXPath(
-          "//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + i + "]/a/span[2]/span[2]");
-      if (school != null && school.asText().contains(SCHOOL)) {
-        index = i;
-      }
-    }
-
-    if (index != -1) {
-      HtmlAnchor a = (HtmlAnchor) rmp
-          .getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul/li[" + index + "]/a");
-      rmp = a.click();
-      String tid = rmp.getUrl().toString().split("=")[1];
-
-      rating = ((HtmlDivision) rmp.getFirstByXPath(
-          "//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div[1]")).asText();
-
-      if (!rating.contains("N/A")) {
-        rating += " based on " + ((HtmlAnchor) rmp
-            .getFirstByXPath("//*[@id=\"root\"]/div/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/a"))
-                .asText();
-      } else {
-        rating = no_rmp_data;
-      }
-      rating += "@@" + tid;
-    }
-
-    profToRating.put(prof, rating);
-    return rating;
   }
 
   private static String no_rmp_data = "0 Ratings Found";

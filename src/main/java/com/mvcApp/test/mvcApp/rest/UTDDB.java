@@ -286,7 +286,12 @@ public class UTDDB {
     }
 
     String url = URL_rmp + prof;
-    HtmlPage rmp = client.getPage(url);
+    HtmlPage rmp;
+    try {
+      rmp = client.getPage(url);
+    } catch (Exception e) {
+      return no_rmp_data;
+    }
     HtmlUnorderedList allProfs =
         (HtmlUnorderedList) rmp.getFirstByXPath("//*[@id=\"searchResultsBox\"]/div[2]/ul");
     int index = -1;

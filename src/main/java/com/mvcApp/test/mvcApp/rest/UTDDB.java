@@ -124,9 +124,10 @@ public class UTDDB {
     System.out.println("INFO: Old ratings and searches loaded.");
 
     // update hashmaps
+    HashMap<String, String> copied = new HashMap<>(profToRating);
     HashMap<String, String> newProfToRating = new HashMap<String, String>();
     int i = 0;
-    for (Map.Entry<String, String> s : profToRating.entrySet()) {
+    for (Map.Entry<String, String> s : copied.entrySet()) {
       String name = s.getKey();
       String newOutput = rating(name);
       System.out.println("Updating professor " + padRight(i++ + "", 5) + "/" + profToRating.size()

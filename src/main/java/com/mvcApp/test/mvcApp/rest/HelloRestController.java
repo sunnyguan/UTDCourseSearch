@@ -68,6 +68,7 @@ public class HelloRestController {
     return "index.html";
   }
 
+  @CrossOrigin
   @RequestMapping("/api/rmp")
   @ResponseBody
   public String rmpAPI(@RequestParam String[] names)

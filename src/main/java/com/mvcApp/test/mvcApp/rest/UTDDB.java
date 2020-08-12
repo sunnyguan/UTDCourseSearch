@@ -368,13 +368,13 @@ public class UTDDB {
     profToRating.put("-Staff-", no_rmp_data);
     try {
       // String searchUrl = "https://coursebook.utdallas.edu/search";
-      // HtmlPage page = client.getPage(searchUrl);
+      // HtmlPage page = client.getPage(searchUrl);js
 
       Unirest.setTimeouts(0, 0);
       HttpResponse<String> response =
-          Unirest.post("http://71e7eebc1cb0.ngrok.io/api/course")
+          Unirest.get("http://411ca35965f7.ngrok.io/api/coursetest?query=" + java.net.URLEncoder.encode(searchQuery))
               .header("Content-Type", "application/json")
-              .body("{\"query\":\"" + searchQuery + "\"}").asString();
+              .asString();
       String resp = response.getBody(); // .substring(21);
       System.out.println(response.getBody());
 
@@ -405,17 +405,17 @@ public class UTDDB {
         timeTrack = System.currentTimeMillis();
         //
 
-        String ufOpen = row.getString("0");
-        String open = "";
+        String ufOpen = row.getString("id");
+        String open = row.getString("open");
         if (ufOpen.contains("Open"))
           open = "Open";
         else if (ufOpen.contains("Full"))
           open = "Full";
 
-        String name = row.getString("2").split("\\(")[0];
-        String covidStatus = row.getString("5");
-        String prof = row.getString("3").trim();
-        String time = row.getString("4");
+        String name = row.getString("name").split("\\(")[0];
+        String covidStatus = row.getString("status");
+        String prof = row.getString("professor").trim();
+        String time = row.getString("time");
 
         if (prof.contains(",")) {
           prof = prof.split(",")[0].trim(); // if two or more professors for one section, only
@@ -442,8 +442,8 @@ public class UTDDB {
 
         String formatName = name.replaceAll("\\(.*\\)", "").replace("CV Honors", "CV");
 
-        String url = row.getString("1").split("\n")[0];
-        String sect = url.split("\\.")[0];
+        String url = row.getString("sid");
+        String sect = url;
 
         // line += "<tr>";
         line += "<td>" + open + "</td>";
@@ -470,7 +470,7 @@ public class UTDDB {
         }
 
         String subj = sect.split(" ")[0];
-        String num = sect.split(" ")[1].split("\\.")[0];
+        String num = sect.split(" ")[1];
         String pr = prof.contains("Staff") ? "" : prof;
         String searchString =
             "https://saitanayd.github.io/utd-grades/?subj=" + subj + "&num=" + num + "&prof=" + pr;

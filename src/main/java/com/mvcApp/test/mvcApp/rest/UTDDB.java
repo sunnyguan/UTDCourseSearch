@@ -372,7 +372,7 @@ public class UTDDB {
 
       Unirest.setTimeouts(0, 0);
       HttpResponse<String> response =
-          Unirest.get("http://411ca35965f7.ngrok.io/api/coursetest?query=" + java.net.URLEncoder.encode(searchQuery))
+          Unirest.get("http://salty-cove-22105.herokuapp.com/api/coursetest?query=" + java.net.URLEncoder.encode(searchQuery))
               .header("Content-Type", "application/json")
               .asString();
       String resp = response.getBody(); // .substring(21);

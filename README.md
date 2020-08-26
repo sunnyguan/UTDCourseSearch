@@ -5,7 +5,19 @@ This project is to provide a consolidated view for UTD course search. It combine
 
 The production deployment is on Heroku platform.  Production URL: https://utdrmp.herokuapp.com/
 
+![](https://raw.githubusercontent.com/sunnyguan/UTDCourseSearch/master/showcase%20(1).gif)
 
+Features shown (in order):
+
+1. Course search
+2. Sort by rating/gpa/overall
+3. Sidebar RMP/GPA data
+4. Popup RMP/GPA data
+5. Add to schedule and sidebar calendar
+6. Conflict check
+7. Remove conflicts
+
+Additional (smaller enhancements) features (such as the two other filters) are not shown in the demo but works as intended.
 
 ## Project Setup
 

@@ -53,7 +53,9 @@ https://www.w3schools.com/html/html5_serversentevents.asp
 
 > A server-sent event (SSE) is when a web page automatically gets updates from a server. This was also possible before, but the web page would have to ask if any updates were available. With server-sent events, the updates come automatically. 
 
+###### Python API
 
+Currently using Python to host the [API backend](https://github.com/sunnyguan/APIs) for retrieving course information. Originally designed to dynamically retrieve course information through Java back-end but a Python backend hosted on a different Heroku app enables more flexibility, especially with the [Angular version](https://github.com/sunnyguan/utdng).
 
 ## License
 

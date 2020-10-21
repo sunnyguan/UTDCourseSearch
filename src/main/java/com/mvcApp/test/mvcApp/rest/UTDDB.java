@@ -259,8 +259,10 @@ public class UTDDB {
       if (!profToGPA.containsKey(name))
         profToGPA.put(name, no_gpa_data);
       String avgGPA = profToGPA.get(name);
-      String[] result = profToRating.get(name).split("@@");
-      if (result.length != 2) {
+	  String[] result = {""};
+	  if (profToRating.containsKey(name))
+		result = profToRating.get(name).split("@@");
+	  if (result.length != 2) {
         professors.add(new Professor("N/A", "N/A", "N/A", avgGPA));
       } else {
         Professor p = new Professor(name, result[0], result[1], avgGPA);

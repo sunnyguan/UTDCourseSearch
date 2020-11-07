@@ -65,7 +65,7 @@ public class HelloRestController {
       }
     }
     newEmitterForUser(id);
-    return "herokuDown.html"; // index.html
+    return "herokuDown.html";
   }
 
   @CrossOrigin
@@ -103,7 +103,7 @@ public class HelloRestController {
     return "result.jsp";
   }
 
-  /@RequestMapping("/home")
+  @RequestMapping("/home")
   public String home() {
     return "home.jsp";
   }
